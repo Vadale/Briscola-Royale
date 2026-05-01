@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0f3320">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>BRISCOLA ROYALE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Bungee&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="crt">
+
+<button id="btn-mute" type="button" aria-label="Silenzia audio" title="Silenzia">SUONO</button>
+
+<!-- =============== SCHERMATA: SELEZIONE SEGNO ZODIACALE =============== -->
+<section id="screen-zodiac" class="screen">
+  <header class="screen-header">
+    <h1 class="title-neon">SCEGLI O' SEGNO TUJO</h1>
+    <p class="subtitle">'O destino tuo sta scritto 'ncielo</p>
+  </header>
+  <main class="screen-main">
+    <div id="zodiac-grid" class="zodiac-grid">
+      <button type="button" class="zodiac-icon" data-sign="ariete"><span class="z-symbol">&#9800;</span><span class="z-name">Ariete</span></button>
+      <button type="button" class="zodiac-icon" data-sign="toro"><span class="z-symbol">&#9801;</span><span class="z-name">Toro</span></button>
+      <button type="button" class="zodiac-icon" data-sign="gemelli"><span class="z-symbol">&#9802;</span><span class="z-name">Gemelli</span></button>
+      <button type="button" class="zodiac-icon" data-sign="cancro"><span class="z-symbol">&#9803;</span><span class="z-name">Cancro</span></button>
+      <button type="button" class="zodiac-icon" data-sign="leone"><span class="z-symbol">&#9804;</span><span class="z-name">Leone</span></button>
+      <button type="button" class="zodiac-icon" data-sign="vergine"><span class="z-symbol">&#9805;</span><span class="z-name">Vergine</span></button>
+      <button type="button" class="zodiac-icon" data-sign="bilancia"><span class="z-symbol">&#9806;</span><span class="z-name">Bilancia</span></button>
+      <button type="button" class="zodiac-icon" data-sign="scorpione"><span class="z-symbol">&#9807;</span><span class="z-name">Scorpione</span></button>
+      <button type="button" class="zodiac-icon" data-sign="sagittario"><span class="z-symbol">&#9808;</span><span class="z-name">Sagittario</span></button>
+      <button type="button" class="zodiac-icon" data-sign="capricorno"><span class="z-symbol">&#9809;</span><span class="z-name">Capricorno</span></button>
+      <button type="button" class="zodiac-icon" data-sign="acquario"><span class="z-symbol">&#9810;</span><span class="z-name">Acquario</span></button>
+      <button type="button" class="zodiac-icon" data-sign="pesci"><span class="z-symbol">&#9811;</span><span class="z-name">Pesci</span></button>
+    </div>
+    <div id="zodiac-detail" class="zodiac-detail" aria-live="polite"></div>
+  </main>
+  <footer class="screen-footer">
+    <button type="button" class="btn-arcade" id="btn-zodiac-confirm" disabled>CONFERMA SEGNO</button>
+  </footer>
+</section>
+
+<!-- =============== SCHERMATA: MENU PRINCIPALE =============== -->
+<section id="screen-menu" class="screen">
+  <header class="screen-header menu-header">
+    <div class="logo-box">
+      <div id="gennarino-menu"></div>
+    </div>
+    <h1 class="title-neon menu-title" id="logo-menu">BRISCOLA<br>ROYALE</h1>
+    <p class="subtitle menu-sub">Tieni 'a mano? Allora vienitenne!</p>
+  </header>
+  <main class="screen-main menu-main">
+    <button type="button" class="btn-arcade btn-big" id="btn-menu-play" data-i18n="menu.play">GIOCA</button>
+    <button type="button" class="btn-arcade" id="btn-how-to-play" data-i18n="menu.howToPlay">COME SI GIOCA?</button>
+    <button type="button" class="btn-arcade btn-premium" id="btn-premium" data-i18n="menu.minigames">MINIGIOCHI</button>
+    <button type="button" class="btn-arcade btn-small" id="btn-collection" data-i18n="menu.collection">COLLEZIONE</button>
+    <button type="button" class="btn-arcade btn-small" id="btn-open-settings" data-i18n="menu.settings">&#9881; IMPOSTAZIONI</button>
+  </main>
+  <footer class="screen-footer menu-footer">
+    <span class="meta-coins">DUCATI: <span id="meta-coins-display">0</span></span>
+    <span class="meta-zodiac">SEGNO: <span id="meta-zodiac-display">--</span></span>
+  </footer>
+</section>
+
+<!-- =============== SCHERMATA: GIOCO =============== -->
+<section id="screen-game" class="screen">
+  <!-- Decorazioni angolari "bisca" (pixel art SVG inline) -->
+  <div class="bisca-deco tl" aria-hidden="true">
+    <!-- Tazzina di caffè -->
+    <svg width="32" height="32" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+      <rect x="3" y="6" width="8" height="6" fill="#fff8e7"/>
+      <rect x="3" y="6" width="8" height="1" fill="#1a0a14"/>
+      <rect x="3" y="11" width="8" height="1" fill="#1a0a14"/>
+      <rect x="3" y="6" width="1" height="6" fill="#1a0a14"/>
+      <rect x="10" y="6" width="1" height="6" fill="#1a0a14"/>
+      <rect x="11" y="7" width="3" height="1" fill="#1a0a14"/>
+      <rect x="13" y="8" width="1" height="2" fill="#1a0a14"/>
+      <rect x="11" y="10" width="2" height="1" fill="#1a0a14"/>
+      <rect x="4" y="7" width="6" height="4" fill="#3b1a0a"/>
+      <rect x="5" y="3" width="1" height="2" fill="#fff" opacity="0.5"/>
+      <rect x="7" y="2" width="1" height="3" fill="#fff" opacity="0.5"/>
+      <rect x="9" y="3" width="1" height="2" fill="#fff" opacity="0.5"/>
+    </svg>
+  </div>
+  <div class="bisca-deco tr" aria-hidden="true">
+    <!-- Lampada da bisca -->
+    <svg width="32" height="32" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+      <rect x="7" y="0" width="2" height="3" fill="#1a0a14"/>
+      <rect x="3" y="3" width="10" height="1" fill="#1a0a14"/>
+      <rect x="2" y="4" width="12" height="3" fill="#e63946"/>
+      <rect x="3" y="7" width="10" height="1" fill="#a3232f"/>
+      <rect x="6" y="8" width="4" height="3" fill="#f4c430" opacity="0.8"/>
+      <rect x="7" y="11" width="2" height="2" fill="#f4c430" opacity="0.4"/>
+    </svg>
+  </div>
+  <div class="bisca-deco bl" aria-hidden="true">
+    <!-- Posacenere con sigaro -->
+    <svg width="32" height="32" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+      <rect x="2" y="10" width="12" height="3" fill="#3b3b3b"/>
+      <rect x="2" y="10" width="12" height="1" fill="#1a0a14"/>
+      <rect x="3" y="13" width="10" height="1" fill="#1a0a14"/>
+      <rect x="8" y="6" width="6" height="1" fill="#8b4513"/>
+      <rect x="14" y="6" width="1" height="1" fill="#e63946"/>
+      <rect x="15" y="5" width="1" height="1" fill="#f4c430"/>
+      <rect x="9" y="4" width="1" height="2" fill="#fff" opacity="0.3"/>
+      <rect x="11" y="3" width="1" height="3" fill="#fff" opacity="0.3"/>
+    </svg>
+  </div>
+  <div class="bisca-deco br" aria-hidden="true">
+    <!-- Mazzo di carte -->
+    <svg width="32" height="32" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+      <rect x="2" y="3" width="8" height="11" fill="#fff8e7"/>
+      <rect x="2" y="3" width="8" height="1" fill="#1a0a14"/>
+      <rect x="2" y="13" width="8" height="1" fill="#1a0a14"/>
+      <rect x="2" y="3" width="1" height="11" fill="#1a0a14"/>
+      <rect x="9" y="3" width="1" height="11" fill="#1a0a14"/>
+      <rect x="4" y="5" width="4" height="1" fill="#e63946"/>
+      <rect x="4" y="11" width="4" height="1" fill="#e63946"/>
+      <rect x="5" y="7" width="2" height="3" fill="#f4c430"/>
+      <rect x="5" y="2" width="8" height="11" fill="#1a0a14" opacity="0.4"/>
+      <rect x="6" y="1" width="8" height="11" fill="#1a0a14" opacity="0.25"/>
+    </svg>
+  </div>
+  <header class="hud" id="hud">
+    <div class="hud-block">
+      <div class="hud-label" data-i18n="hud.ante">ANTE</div>
+      <div class="hud-value" id="hud-ante">1/8</div>
+    </div>
+    <div class="hud-block">
+      <div class="hud-label" data-i18n="hud.round">ROUND</div>
+      <div class="hud-value" id="hud-round">SMALL</div>
+    </div>
+    <div class="hud-block hud-score">
+      <div class="hud-label" data-i18n="hud.score">PUNTI</div>
+      <div class="hud-value score-big" id="hud-score">0</div>
+      <div class="hud-progress"><div class="hud-progress-bar" id="hud-progress-bar"></div></div>
+      <div class="hud-target"><span data-i18n="hud.target">OBIETTIVO</span>: <span id="hud-target">300</span></div>
+    </div>
+    <div class="hud-block">
+      <div class="hud-label" data-i18n="hud.hands">MANI</div>
+      <div class="hud-value hud-blu" id="hud-hands">4</div>
+    </div>
+    <div class="hud-block">
+      <div class="hud-label" data-i18n="hud.discards">SCARTI</div>
+      <div class="hud-value hud-red" id="hud-discards">3</div>
+    </div>
+    <div class="hud-block">
+      <div class="hud-label" data-i18n="hud.ducats">DUCATI</div>
+      <div class="hud-value hud-gold" id="hud-money">$ 4</div>
+    </div>
+    <div class="hud-block" id="hud-briscola">
+      <span class="hud-label" data-i18n="hud.briscola">BRISCOLA</span>
+      <span class="hud-value" id="hud-briscola-seme">—</span>
+    </div>
+    <div class="hud-badges">
+      <span id="hud-daily-badge" class="hud-daily-badge" style="display:none">&#128197; DAILY</span>
+      <span id="hud-endless-badge" class="hud-endless-badge" style="display:none">&#8734; ENDLESS</span>
+    </div>
+  </header>
+
+  <aside class="joker-bar" id="joker-bar" aria-label="Jolly attivi">
+    <div class="joker-bar-label">JOLLY</div>
+    <div class="joker-slots" id="joker-slots"></div>
+    <div class="joker-bar-label" style="margin-top:6px">TAROCCHI</div>
+    <div class="consumable-bar" id="consumable-bar"></div>
+    <div id="gennarino-game"></div>
+  </aside>
+
+  <main class="screen-main game-main">
+    <div class="played-area" id="cards-played" aria-label="Carte giocate"></div>
+
+    <div class="deck-area" id="deck-area">
+      <button type="button" class="deck-btn" id="btn-draw-card" title="Clicca per pescare una carta">
+        <div class="deck-stack">
+          <div class="deck-card-back"></div>
+          <div class="deck-card-back deck-card-2"></div>
+          <div class="deck-card-back deck-card-3"></div>
+        </div>
+        <div class="deck-info-overlay">
+          <span class="deck-count-num" id="deck-count">40</span>
+          <span class="deck-count-label">carte</span>
+        </div>
+      </button>
+      <div class="deck-draws-indicator">
+        <span class="draws-label">PESCATE</span>
+        <span class="draws-value" id="draws-left">4</span>
+      </div>
+    </div>
+
+    <div class="hand-area" id="cards-hand" aria-label="Carte in mano"></div>
+
+    <div class="round-info" id="round-info">
+      <span id="hand-type-display">--</span>
+      <span class="chips-mult" id="chips-mult-display">0 &times; 0</span>
+    </div>
+
+    <div class="action-bar">
+      <button type="button" class="btn-arcade btn-play" id="btn-play" disabled data-i18n="btn.playHand">GIOCA</button>
+      <button type="button" class="btn-arcade btn-sort" id="btn-sort-rank" data-i18n="btn.sortRank">ORDINA</button>
+      <button type="button" class="btn-arcade btn-discard" id="btn-discard" disabled data-i18n="btn.discard">SCARTA</button>
+      <button type="button" class="btn-arcade btn-small btn-combo-help" id="btn-combo-help" data-i18n="btn.combo">COMBO?</button>
+    </div>
+  </main>
+
+  <footer class="screen-footer game-footer">
+    <button type="button" class="btn-text" id="btn-run-info">INFO RUN</button>
+    <button type="button" class="btn-text" id="btn-quit-run">ABBANDONA</button>
+  </footer>
+</section>
+
+<!-- =============== SCHERMATA: NEGOZIO =============== -->
+<section id="screen-shop" class="screen">
+  <header class="screen-header shop-header">
+    <h1 class="title-neon shop-title">'O NEGOZIO 'E DON CARMINE</h1>
+    <p class="subtitle">Spendi sti ducati ca te bruciano 'ncopp' 'a sacca</p>
+    <div class="shop-coins">DUCATI: <span id="shop-coins-display">0</span></div>
+  </header>
+  <main class="screen-main shop-main">
+    <section class="shop-section">
+      <h2 class="shop-section-title">MAZZETTI &amp; JOLLY</h2>
+      <div class="shop-row" id="shop-jokers"></div>
+    </section>
+    <section class="shop-section">
+      <h2 class="shop-section-title">TAROCCHI</h2>
+      <div class="shop-row" id="shop-tarots"></div>
+    </section>
+    <section class="shop-section">
+      <h2 class="shop-section-title">PACCHETTI</h2>
+      <div class="shop-row" id="shop-packs"></div>
+    </section>
+  </main>
+  <footer class="screen-footer shop-footer">
+    <button type="button" class="btn-arcade btn-reroll" id="btn-reroll">RILANCIA ($5)</button>
+    <button type="button" class="btn-arcade btn-next" id="btn-next">AVANTI &raquo;</button>
+  </footer>
+</section>
+
+<!-- =============== SCHERMATA: SLOT MACHINE =============== -->
+<section id="screen-slot" class="screen">
+  <header class="screen-header slot-header">
+    <h1 class="title-neon slot-title">SLOT D' 'O DESTINO</h1>
+    <p class="subtitle">Vire si 'a fortuna te vasa</p>
+  </header>
+  <main class="screen-main slot-main">
+    <div class="slot-cabinet">
+      <div class="bulb-row top">
+        <span class="bulb"></span><span class="bulb"></span><span class="bulb"></span>
+        <span class="bulb"></span><span class="bulb"></span><span class="bulb"></span>
+        <span class="bulb"></span><span class="bulb"></span>
+      </div>
+      <div class="reels-box">
+        <div class="reel" id="reel-1">&#127815;</div>
+        <div class="reel" id="reel-2">&#127815;</div>
+        <div class="reel" id="reel-3">&#127815;</div>
+      </div>
+      <div class="bulb-row bottom">
+        <span class="bulb"></span><span class="bulb"></span><span class="bulb"></span>
+        <span class="bulb"></span><span class="bulb"></span><span class="bulb"></span>
+        <span class="bulb"></span><span class="bulb"></span>
+      </div>
+      <div class="slot-display" id="slot-display">INSERISCI 'NU DUCATO</div>
+      <span id="slot-cost-label" class="tombola-counter" style="font-size:16px"></span>
+      <button type="button" class="slot-lever" id="btn-slot-spin" aria-label="Tira la leva">
+        <span class="lever-stick"></span>
+        <span class="lever-ball"></span>
+      </button>
+    </div>
+  </main>
+  <footer class="screen-footer slot-footer">
+    <span class="slot-credit">CREDITI: <span id="slot-credit">0</span></span>
+    <button type="button" class="btn-arcade" id="btn-slot-exit">ESCI</button>
+  </footer>
+</section>
+
+<!-- =============== SCHERMATA: TOMBOLA =============== -->
+<section id="screen-tombola" class="screen">
+  <header class="screen-header tombola-header">
+    <h1 class="title-neon tombola-title">TOMBOLA D' 'A NONNA</h1>
+    <p class="subtitle">Novanta numeri, 'na speranza</p>
+  </header>
+  <main class="screen-main tombola-main">
+    <div class="tombola-grid tombola-card" id="tombola-card" aria-label="Cartella tombola"></div>
+    <div class="tombola-extracted">
+      <h3 class="tombola-extracted-title">ULTIMI ESTRATTI</h3>
+      <div class="tombola-extracted-row" id="tombola-last-numbers"></div>
+    </div>
+    <span id="tombola-extract-counter" class="tombola-counter">ESTRAZIONI: 0 / 9</span>
+    <button type="button" class="btn-arcade btn-big" id="btn-tombola-extract">ESTRAI NUMERO</button>
+  </main>
+  <footer class="screen-footer tombola-footer">
+    <span class="tombola-status" id="tombola-status">AMBO --- TERNA --- TOMBOLA</span>
+    <button type="button" class="btn-arcade" id="btn-tombola-exit">ESCI</button>
+  </footer>
+</section>
+
+<!-- =============== SCHERMATA: GAME OVER =============== -->
+<section id="screen-end" class="screen">
+  <header class="screen-header end-header">
+    <h1 class="title-neon end-title" id="end-title">FINE D' 'A PARTITA</h1>
+  </header>
+  <main class="screen-main end-main">
+    <section class="end-stats" id="end-stats">
+      <h2 class="end-section-title">STATISTICHE D' 'A RUN</h2>
+      <ul class="stat-list">
+        <li>Punteggio finale: <strong id="end-score" class="stat-score-value">0</strong></li>
+        <li>Ante raggiunto: <strong id="end-ante">1</strong></li>
+        <li>Mani giocate: <strong id="end-hands">0</strong></li>
+        <li>Ducati spesi: <strong id="end-spent">0</strong></li>
+        <li>Jolly comprati: <strong id="end-jokers">0</strong></li>
+      </ul>
+    </section>
+    <section class="end-prediction" id="end-prediction">
+      <h2 class="end-section-title">'O MAGO TE DICE...</h2>
+      <div class="prediction-box" id="end-prediction-box">
+        <p class="prediction-text" id="end-prediction-text">Le stelle stanno mute, &#39;o mago s&#39;&egrave; addurmuto.</p>
+      </div>
+    </section>
+  </main>
+  <footer class="screen-footer end-footer">
+    <button type="button" class="btn-arcade" id="btn-retry" data-i18n="end.retry">RIGIOCA</button>
+    <button type="button" class="btn-arcade btn-small" id="btn-menu-end" data-i18n="end.menu">MENU</button>
+  </footer>
+</section>
+
+<!-- =============== SCHERMATA: IMPOSTAZIONI =============== -->
+<section id="screen-settings" class="screen">
+  <header class="screen-header settings-header">
+    <button type="button" class="btn-arcade btn-small btn-back" id="btn-settings-back" data-i18n="settings.back">&laquo; INDIETRO</button>
+    <h1 class="title-neon settings-title" data-i18n="settings.title">&#9881; IMPOSTAZIONI</h1>
+  </header>
+  <main class="screen-main settings-main">
+
+    <section class="settings-section">
+      <h2 class="settings-section-title" data-i18n="settings.audio">AUDIO</h2>
+      <div class="settings-row">
+        <label class="settings-label" for="settings-bgm-vol" data-i18n="settings.bgmVol">Volume musica</label>
+        <input type="range" id="settings-bgm-vol" min="0" max="100" step="5" value="40" class="settings-slider">
+        <span class="settings-value" id="settings-bgm-vol-display">40</span>
+      </div>
+      <div class="settings-row">
+        <label class="settings-label" for="settings-sfx-vol" data-i18n="settings.sfxVol">Volume effetti</label>
+        <input type="range" id="settings-sfx-vol" min="0" max="100" step="5" value="80" class="settings-slider">
+        <span class="settings-value" id="settings-sfx-vol-display">80</span>
+      </div>
+      <div class="settings-row">
+        <span class="settings-label">Audio</span>
+        <button type="button" class="btn-arcade btn-small" id="btn-settings-mute">&#128266; ATTIVO</button>
+      </div>
+    </section>
+
+    <section class="settings-section">
+      <h2 class="settings-section-title" data-i18n="settings.zodiac">SEGNO ZODIACALE</h2>
+      <div class="settings-row settings-zodiac-row">
+        <span class="settings-label">Segno corrente</span>
+        <span class="settings-zodiac-current">
+          <span class="settings-zodiac-symbol" id="settings-zodiac-symbol">&#9804;</span>
+          <span class="settings-zodiac-name" id="settings-zodiac-name">--</span>
+        </span>
+      </div>
+      <div class="settings-row">
+        <button type="button" class="btn-arcade btn-small" id="btn-settings-change-zodiac" data-i18n="settings.changeZodiac">CAMBIA SEGNO</button>
+      </div>
+    </section>
+
+    <section class="settings-section">
+      <h2 class="settings-section-title" data-i18n="settings.stats">STATISTICHE</h2>
+      <table class="settings-stats">
+        <tbody>
+          <tr><td class="stat-label">Partite giocate</td><td class="stat-value" id="stat-total-runs">0</td></tr>
+          <tr><td class="stat-label">Vittorie</td><td class="stat-value" id="stat-victories">0</td></tr>
+          <tr><td class="stat-label">Sconfitte</td><td class="stat-value" id="stat-defeats">0</td></tr>
+          <tr><td class="stat-label">Boss battuti</td><td class="stat-value" id="stat-boss-defeated">0</td></tr>
+          <tr><td class="stat-label">Punteggio migliore</td><td class="stat-value" id="stat-best-score">0</td></tr>
+          <tr><td class="stat-label">Ducati totali</td><td class="stat-value" id="stat-total-ducats">0</td></tr>
+          <tr><td class="stat-label">Combo preferita</td><td class="stat-value" id="stat-favorite-combo">&mdash;</td></tr>
+          <tr><td class="stat-label">Jolly preferito</td><td class="stat-value" id="stat-favorite-joker">&mdash;</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="settings-section">
+      <h3 class="settings-section-title" data-i18n="settings.lang">LINGUA</h3>
+      <button type="button" class="btn-arcade" id="btn-lang-toggle">IT | EN</button>
+    </section>
+
+    <section class="settings-section">
+      <h2 class="settings-section-title">DATI</h2>
+      <div class="settings-row">
+        <button type="button" class="btn-arcade btn-small btn-reset-save" id="btn-settings-reset">RESET SALVATAGGIO</button>
+      </div>
+      <p class="settings-warning">Attenzione: cancellera' tutti i progressi, ducati, jolly e statistiche.</p>
+    </section>
+
+  </main>
+  <footer class="screen-footer settings-footer">
+    <span class="settings-version">v1.0 &mdash; BRISCOLA ROYALE</span>
+  </footer>
+</section>
+
+<!-- =============== SCHERMATA: COLLEZIONE =============== -->
+<section id="screen-collection" class="screen">
+  <div class="screen-inner">
+    <header class="screen-header">
+      <button type="button" class="btn-arcade btn-sm" id="btn-coll-back" data-i18n="settings.back">&laquo; INDIETRO</button>
+      <h2 class="screen-title" data-i18n="coll.title">COLLEZIONE</h2>
+    </header>
+    <div id="coll-filter-bar" class="coll-filter-bar">
+      <button type="button" class="btn-arcade btn-sm coll-filter active" data-filter="all" data-i18n="coll.all">TUTTI</button>
+      <button type="button" class="btn-arcade btn-sm coll-filter" data-filter="seen" data-i18n="coll.filterSeen">VISTI</button>
+      <button type="button" class="btn-arcade btn-sm coll-filter" data-filter="locked" data-i18n="coll.filterLocked">BLOCCATI</button>
+    </div>
+    <div id="coll-grid" class="coll-grid"></div>
+    <p class="coll-counter" id="coll-counter">0 / 0 sbloccati</p>
+  </div>
+</section>
+
+<!-- =============== SCHERMATA: MINI-GIOCHI (SVAGO) =============== -->
+<section id="screen-minigames" class="screen">
+  <div class="screen-inner">
+    <header class="screen-header">
+      <button type="button" class="btn-arcade btn-sm" id="btn-minigames-back">&laquo; INDIETRO</button>
+      <h2 class="screen-title">SVAGO</h2>
+    </header>
+    <p class="minigames-sub">Quattro juochi 'e bisca pe' fa' passa' 'o tiempo</p>
+    <div class="minigames-grid">
+      <button type="button" class="minigame-card" id="mg-tabacchi">
+        <div class="mg-icon">&#128684;</div>
+        <div class="mg-title">TABACCHI</div>
+        <div class="mg-desc">Fumati tutto il pacchetto</div>
+        <div class="mg-reward">+10 &#128176;</div>
+      </button>
+      <button type="button" class="minigame-card" id="mg-cassaforte">
+        <div class="mg-icon">&#128274;</div>
+        <div class="mg-title">CASSAFORTE D'ORO</div>
+        <div class="mg-desc">Spaccala col piede di porco</div>
+        <div class="mg-reward">+100 &#128176;</div>
+      </button>
+      <button type="button" class="minigame-card" id="mg-jackpot">
+        <div class="mg-icon">&#127920;</div>
+        <div class="mg-title">JACKPOT</div>
+        <div class="mg-desc">Slot machine — tenta la fortuna</div>
+        <div class="mg-reward">variabile</div>
+      </button>
+      <button type="button" class="minigame-card" id="mg-pachinko">
+        <div class="mg-icon">&#127919;</div>
+        <div class="mg-title">PACHINKO</div>
+        <div class="mg-desc">Spara la pallina e fai punti</div>
+        <div class="mg-reward">5&ndash;50 &#128176;</div>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- =============== OVERLAY GLOBALI =============== -->
+<div id="toast-container" aria-live="polite" aria-atomic="true"></div>
+<div id="popup-overlay" class="popup-overlay" aria-hidden="true">
+  <div class="popup-box" id="popup-box" role="dialog" aria-modal="true"></div>
+</div>
+
+<!-- =============== JS (ordine obbligato) =============== -->
+<script defer src="sprites.js"></script>
+<script defer src="data.js"></script>
+<script defer src="cards.js"></script>
+<script defer src="audio.js"></script>
+<script defer src="gennarino.js"></script>
+<script defer src="zodiac.js"></script>
+<script defer src="game.js"></script>
+<script defer src="shop.js"></script>
+<script defer src="bonus.js"></script>
+<script defer src="app.js"></script>
+<script defer src="tutorial.js"></script>
+
+</body>
+</html>

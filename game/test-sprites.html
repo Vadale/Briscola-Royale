@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Sprites Test — Briscola Royale</title>
+<style>
+  body { background: #0f3320; color: #fff8e7; font-family: monospace; padding: 20px; }
+  h2 { color: #f4c430; margin: 24px 0 8px; font-size: 14px; }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; margin-bottom: 16px; }
+  .label { font-size: 9px; color: #ccc; text-align: center; margin-top: 4px; }
+  .item { display: flex; flex-direction: column; align-items: center; }
+</style>
+</head>
+<body>
+<h1 style="color:#f4c430; font-size:18px;">🎰 BRISCOLA ROYALE — Sprites Test</h1>
+<div id="output">Caricamento sprites...</div>
+<script src="sprites.js"></script>
+<script>
+const out = document.getElementById('output');
+const S = window.SPRITES;
+if (!S) { out.textContent = 'ERRORE: sprites.js non caricato'; }
+else {
+  let h = '';
+
+  // Carte per seme
+  ['bastoni','coppe','denari','spade'].forEach(seme => {
+    h += `<h2>CARTE — ${seme.toUpperCase()}</h2><div class="row">`;
+    [1,2,3,4,5,6,7,'fante','cavallo','re'].forEach(v => {
+      h += `<div class="item">${S.card(seme, v, {size:'sm'})}<div class="label">${v}</div></div>`;
+    });
+    h += '</div>';
+  });
+
+  // Carta retro
+  h += `<h2>CARTA RETRO</h2><div class="row">`;
+  ['sm','md','lg'].forEach(sz => {
+    h += `<div class="item">${S.cardBack({size:sz})}<div class="label">${sz}</div></div>`;
+  });
+  h += '</div>';
+
+  // Gennarino
+  h += `<h2>GENNARINO — EMOZIONI</h2><div class="row">`;
+  ['idle','happy','sad','angry','shocked','thinking','money','winking','dancing','sleeping'].forEach(e => {
+    h += `<div class="item">${S.gennarino(e, 64)}<div class="label">${e}</div></div>`;
+  });
+  h += '</div>';
+
+  // Slot symbols
+  h += `<h2>SIMBOLI SLOT</h2><div class="row">`;
+  ['cherry','lemon','bell','coin','seven','star','diamond'].forEach(sym => {
+    h += `<div class="item">${S.slotSymbol(sym)}<div class="label">${sym}</div></div>`;
+  });
+  h += '</div>';
+
+  // Joker cards
+  h += `<h2>JOKER — RARITÀ</h2><div class="row">`;
+  [['common','🎭','#2d1a2e'],['uncommon','🪬','#1a2d1a'],['rare','👑','#1a1a2d'],['legendary','💎','#2d2000']].forEach(([r,e,bg]) => {
+    h += `<div class="item">${S.jokerCard(r, e, bg)}<div class="label">${r}</div></div>`;
+  });
+  h += '</div>';
+
+  // Boss frames
+  h += `<h2>BOSS PORTRAITS</h2><div class="row">`;
+  [['pulcinella',"Pulcinella Nero"],['munaciello',"'O Munaciello"],['janara',"'A Janara"],['sangennaro','San Gennaro'],['pazzariello',"'O Pazzariello"]].forEach(([id,nm]) => {
+    h += `<div class="item" style="transform:scale(0.6);transform-origin:top left;width:120px;height:144px;">${S.bossFrame(id, nm)}<div class="label" style="margin-top:-90px;">${id}</div></div>`;
+  });
+  h += '</div>';
+
+  out.innerHTML = h;
+}
+</script>
+</body>
+</html>
