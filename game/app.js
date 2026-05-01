@@ -248,6 +248,18 @@ function applyLang() {
     const lang = (STATE.meta && STATE.meta.lang) || 'it';
     btnLang.textContent = lang === 'en' ? 'EN | IT' : 'IT | EN';
   }
+  // Aggiorna i bottoni mute (testo dinamico non gestito da data-i18n)
+  try {
+    if (typeof STATE !== 'undefined' && STATE && STATE.settings) {
+      const muted = STATE.settings.sound === false;
+      const muteTopBtn = document.getElementById('btn-mute');
+      if (muteTopBtn) muteTopBtn.textContent = muted ? t('settings.mute') : t('settings.unmute');
+      const muteSetBtn = document.getElementById('btn-settings-mute');
+      if (muteSetBtn) {
+        muteSetBtn.textContent = muted ? ('🔇 ' + t('settings.mute')) : ('🔊 ' + t('settings.unmute'));
+      }
+    }
+  } catch (e) { /* ignore */ }
 }
 
 function setMute(muted) {
@@ -255,7 +267,7 @@ function setMute(muted) {
   const btn = document.getElementById('btn-mute');
   if (btn) {
     btn.classList.toggle('muted', muted);
-    btn.textContent = muted ? 'MUTO' : 'SUONO';
+    btn.textContent = muted ? t('settings.mute') : t('settings.unmute');
   }
   if (window.SN_Audio && typeof window.SN_Audio.setMuted === 'function') {
     window.SN_Audio.setMuted(muted);
@@ -668,12 +680,12 @@ function _promptRunMode(callback) {
     '<div class="run-mode-popup">' +
       '<h2 class="popup-title">NUOVA PARTITA</h2>' +
       '<p style="font-size:8px;color:var(--bianco-panna);margin:8px 0">Come vuoi giocare?</p>' +
-      '<button type="button" class="btn-arcade btn-big" id="btn-run-random" style="margin-bottom:8px">&#127922; CASUALE</button>' +
-      '<button type="button" class="btn-arcade" id="btn-run-daily"' + (dailyWonToday ? ' disabled' : '') + '>&#128197; DAILY &mdash; ' + dateStr + (dailyWonToday ? ' &check;' : '') + '</button>' +
+      '<button type="button" class="btn-arcade btn-big" id="btn-run-random" style="margin-bottom:8px">&#127922; ' + t('run.random') + '</button>' +
+      '<button type="button" class="btn-arcade" id="btn-run-daily"' + (dailyWonToday ? ' disabled' : '') + '>&#128197; ' + t('run.daily') + ' &mdash; ' + dateStr + (dailyWonToday ? ' &check;' : '') + '</button>' +
       '<p style="font-size:7px;color:rgba(255,248,231,0.5);margin-top:8px">' +
       (dailyWonToday ? "Daily di oggi gia' vinto! Torna domani per uno nuovo." : 'Il daily usa lo stesso seed per tutti oggi') +
       '</p>' +
-      '<button type="button" class="btn-arcade btn-small" data-popup-close="cancel" style="margin-top:8px">ANNULLA</button>' +
+      '<button type="button" class="btn-arcade btn-small" data-popup-close="cancel" style="margin-top:8px">' + t('btn.cancel') + '</button>' +
     '</div>'
   );
   setTimeout(() => {
@@ -817,11 +829,11 @@ function wireNavigation() {
         return;
       }
       box.innerHTML = `
-        <p class="popup-title" style="color:var(--rosso)">⚠ ABBANDONA RUN?</p>
-        <p style="font-size:8px;color:var(--bianco-panna);margin:8px 0">Perderai tutti i progressi di questa run.</p>
+        <p class="popup-title" style="color:var(--rosso)">⚠ ${t('btn.abandon')}?</p>
+        <p style="font-size:8px;color:var(--bianco-panna);margin:8px 0">${t('abandon.confirm')}</p>
         <div style="display:flex;gap:8px;justify-content:center;margin-top:12px">
-          <button type="button" class="btn-arcade btn-sm" id="btn-confirm-abandon" style="background:var(--rosso)">SÌ, ABBANDONA</button>
-          <button type="button" class="btn-arcade btn-sm" data-popup-close="cancel">ANNULLA</button>
+          <button type="button" class="btn-arcade btn-sm" id="btn-confirm-abandon" style="background:var(--rosso)">${t('abandon.yes')}</button>
+          <button type="button" class="btn-arcade btn-sm" data-popup-close="cancel">${t('btn.cancel')}</button>
         </div>
       `;
       overlay.classList.add('open');
@@ -1011,7 +1023,7 @@ function populateSettings() {
   const muteBtn = document.getElementById('btn-settings-mute');
   if (muteBtn) {
     const isOn = settings.sound !== false;
-    muteBtn.textContent = isOn ? '🔊 ATTIVO' : '🔇 SILENZIATO';
+    muteBtn.textContent = isOn ? ('🔊 ' + t('settings.unmute')) : ('🔇 ' + t('settings.mute'));
     muteBtn.classList.toggle('muted', !isOn);
   }
 
@@ -1544,7 +1556,7 @@ function wireSettings() {
       const wasOn = STATE.settings.sound !== false;
       const nowMuted = wasOn; // se prima era ON, ora silenziamo
       setMute(nowMuted);
-      muteBtn.textContent = nowMuted ? '🔇 SILENZIATO' : '🔊 ATTIVO';
+      muteBtn.textContent = nowMuted ? ('🔇 ' + t('settings.mute')) : ('🔊 ' + t('settings.unmute'));
       muteBtn.classList.toggle('muted', nowMuted);
     });
   }
@@ -1559,7 +1571,7 @@ function wireSettings() {
   const btnReset = document.getElementById('btn-settings-reset');
   if (btnReset) {
     btnReset.addEventListener('click', () => {
-      if (confirm('Sei sicuro? Perderai tutto il salvataggio!')) {
+      if (confirm(t('settings.resetWarning'))) {
         try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
         location.reload();
       }

@@ -19,28 +19,28 @@
 <!-- =============== SCHERMATA: SELEZIONE SEGNO ZODIACALE =============== -->
 <section id="screen-zodiac" class="screen">
   <header class="screen-header">
-    <h1 class="title-neon">SCEGLI O' SEGNO TUJO</h1>
-    <p class="subtitle">'O destino tuo sta scritto 'ncielo</p>
+    <h1 class="title-neon" data-i18n="zodiac.title">SCEGLI O' SEGNO TUJO</h1>
+    <p class="subtitle" data-i18n="zodiac.subtitle">'O destino tuo sta scritto 'ncielo</p>
   </header>
   <main class="screen-main">
     <div id="zodiac-grid" class="zodiac-grid">
-      <button type="button" class="zodiac-icon" data-sign="ariete"><span class="z-symbol">&#9800;</span><span class="z-name">Ariete</span></button>
-      <button type="button" class="zodiac-icon" data-sign="toro"><span class="z-symbol">&#9801;</span><span class="z-name">Toro</span></button>
-      <button type="button" class="zodiac-icon" data-sign="gemelli"><span class="z-symbol">&#9802;</span><span class="z-name">Gemelli</span></button>
-      <button type="button" class="zodiac-icon" data-sign="cancro"><span class="z-symbol">&#9803;</span><span class="z-name">Cancro</span></button>
-      <button type="button" class="zodiac-icon" data-sign="leone"><span class="z-symbol">&#9804;</span><span class="z-name">Leone</span></button>
-      <button type="button" class="zodiac-icon" data-sign="vergine"><span class="z-symbol">&#9805;</span><span class="z-name">Vergine</span></button>
-      <button type="button" class="zodiac-icon" data-sign="bilancia"><span class="z-symbol">&#9806;</span><span class="z-name">Bilancia</span></button>
-      <button type="button" class="zodiac-icon" data-sign="scorpione"><span class="z-symbol">&#9807;</span><span class="z-name">Scorpione</span></button>
-      <button type="button" class="zodiac-icon" data-sign="sagittario"><span class="z-symbol">&#9808;</span><span class="z-name">Sagittario</span></button>
-      <button type="button" class="zodiac-icon" data-sign="capricorno"><span class="z-symbol">&#9809;</span><span class="z-name">Capricorno</span></button>
-      <button type="button" class="zodiac-icon" data-sign="acquario"><span class="z-symbol">&#9810;</span><span class="z-name">Acquario</span></button>
-      <button type="button" class="zodiac-icon" data-sign="pesci"><span class="z-symbol">&#9811;</span><span class="z-name">Pesci</span></button>
+      <button type="button" class="zodiac-icon" data-sign="ariete"><span class="z-symbol">&#9800;</span><span class="z-name" data-i18n="zodiac.sign.ariete">Ariete</span></button>
+      <button type="button" class="zodiac-icon" data-sign="toro"><span class="z-symbol">&#9801;</span><span class="z-name" data-i18n="zodiac.sign.toro">Toro</span></button>
+      <button type="button" class="zodiac-icon" data-sign="gemelli"><span class="z-symbol">&#9802;</span><span class="z-name" data-i18n="zodiac.sign.gemelli">Gemelli</span></button>
+      <button type="button" class="zodiac-icon" data-sign="cancro"><span class="z-symbol">&#9803;</span><span class="z-name" data-i18n="zodiac.sign.cancro">Cancro</span></button>
+      <button type="button" class="zodiac-icon" data-sign="leone"><span class="z-symbol">&#9804;</span><span class="z-name" data-i18n="zodiac.sign.leone">Leone</span></button>
+      <button type="button" class="zodiac-icon" data-sign="vergine"><span class="z-symbol">&#9805;</span><span class="z-name" data-i18n="zodiac.sign.vergine">Vergine</span></button>
+      <button type="button" class="zodiac-icon" data-sign="bilancia"><span class="z-symbol">&#9806;</span><span class="z-name" data-i18n="zodiac.sign.bilancia">Bilancia</span></button>
+      <button type="button" class="zodiac-icon" data-sign="scorpione"><span class="z-symbol">&#9807;</span><span class="z-name" data-i18n="zodiac.sign.scorpione">Scorpione</span></button>
+      <button type="button" class="zodiac-icon" data-sign="sagittario"><span class="z-symbol">&#9808;</span><span class="z-name" data-i18n="zodiac.sign.sagittario">Sagittario</span></button>
+      <button type="button" class="zodiac-icon" data-sign="capricorno"><span class="z-symbol">&#9809;</span><span class="z-name" data-i18n="zodiac.sign.capricorno">Capricorno</span></button>
+      <button type="button" class="zodiac-icon" data-sign="acquario"><span class="z-symbol">&#9810;</span><span class="z-name" data-i18n="zodiac.sign.acquario">Acquario</span></button>
+      <button type="button" class="zodiac-icon" data-sign="pesci"><span class="z-symbol">&#9811;</span><span class="z-name" data-i18n="zodiac.sign.pesci">Pesci</span></button>
     </div>
     <div id="zodiac-detail" class="zodiac-detail" aria-live="polite"></div>
   </main>
   <footer class="screen-footer">
-    <button type="button" class="btn-arcade" id="btn-zodiac-confirm" disabled>CONFERMA SEGNO</button>
+    <button type="button" class="btn-arcade" id="btn-zodiac-confirm" data-i18n="zodiac.confirm" disabled>CONFERMA SEGNO</button>
   </footer>
 </section>
 
@@ -51,7 +51,7 @@
       <div id="gennarino-menu"></div>
     </div>
     <h1 class="title-neon menu-title" id="logo-menu">BRISCOLA<br>ROYALE</h1>
-    <p class="subtitle menu-sub">Tieni 'a mano? Allora vienitenne!</p>
+    <p class="subtitle menu-sub" data-i18n="menu.subtitle">Tieni 'a mano? Allora vienitenne!</p>
   </header>
   <main class="screen-main menu-main">
     <button type="button" class="btn-arcade btn-big" id="btn-menu-play" data-i18n="menu.play">GIOCA</button>
@@ -61,8 +61,8 @@
     <button type="button" class="btn-arcade btn-small" id="btn-open-settings" data-i18n="menu.settings">&#9881; IMPOSTAZIONI</button>
   </main>
   <footer class="screen-footer menu-footer">
-    <span class="meta-coins">DUCATI: <span id="meta-coins-display">0</span></span>
-    <span class="meta-zodiac">SEGNO: <span id="meta-zodiac-display">--</span></span>
+    <span class="meta-coins"><span data-i18n="menu.ducatsLabel">DUCATI</span>: <span id="meta-coins-display">0</span></span>
+    <span class="meta-zodiac"><span data-i18n="menu.signLabel">SEGNO</span>: <span id="meta-zodiac-display">--</span></span>
   </footer>
 </section>
 
@@ -163,9 +163,9 @@
   </header>
 
   <aside class="joker-bar" id="joker-bar" aria-label="Jolly attivi">
-    <div class="joker-bar-label">JOLLY</div>
+    <div class="joker-bar-label" data-i18n="game.jokers">JOLLY</div>
     <div class="joker-slots" id="joker-slots"></div>
-    <div class="joker-bar-label" style="margin-top:6px">TAROCCHI</div>
+    <div class="joker-bar-label" style="margin-top:6px" data-i18n="game.tarots">TAROCCHI</div>
     <div class="consumable-bar" id="consumable-bar"></div>
     <div id="gennarino-game"></div>
   </aside>
@@ -182,11 +182,11 @@
         </div>
         <div class="deck-info-overlay">
           <span class="deck-count-num" id="deck-count">40</span>
-          <span class="deck-count-label">carte</span>
+          <span class="deck-count-label" data-i18n="game.cards">carte</span>
         </div>
       </button>
       <div class="deck-draws-indicator">
-        <span class="draws-label">PESCATE</span>
+        <span class="draws-label" data-i18n="game.draws">PESCATE</span>
         <span class="draws-value" id="draws-left">4</span>
       </div>
     </div>
@@ -207,29 +207,29 @@
   </main>
 
   <footer class="screen-footer game-footer">
-    <button type="button" class="btn-text" id="btn-run-info">INFO RUN</button>
-    <button type="button" class="btn-text" id="btn-quit-run">ABBANDONA</button>
+    <button type="button" class="btn-text" id="btn-run-info" data-i18n="btn.infoRun">INFO RUN</button>
+    <button type="button" class="btn-text" id="btn-quit-run" data-i18n="btn.abandon">ABBANDONA</button>
   </footer>
 </section>
 
 <!-- =============== SCHERMATA: NEGOZIO =============== -->
 <section id="screen-shop" class="screen">
   <header class="screen-header shop-header">
-    <h1 class="title-neon shop-title">'O NEGOZIO 'E DON CARMINE</h1>
-    <p class="subtitle">Spendi sti ducati ca te bruciano 'ncopp' 'a sacca</p>
-    <div class="shop-coins">DUCATI: <span id="shop-coins-display">0</span></div>
+    <h1 class="title-neon shop-title" data-i18n="shop.mainTitle">'O NEGOZIO 'E DON CARMINE</h1>
+    <p class="subtitle" data-i18n="shop.mainSubtitle">Spendi sti ducati ca te bruciano 'ncopp' 'a sacca</p>
+    <div class="shop-coins"><span data-i18n="shop.ducatsLabel">DUCATI</span>: <span id="shop-coins-display">0</span></div>
   </header>
   <main class="screen-main shop-main">
     <section class="shop-section">
-      <h2 class="shop-section-title">MAZZETTI &amp; JOLLY</h2>
+      <h2 class="shop-section-title" data-i18n="shop.sectionJokers">MAZZETTI &amp; JOLLY</h2>
       <div class="shop-row" id="shop-jokers"></div>
     </section>
     <section class="shop-section">
-      <h2 class="shop-section-title">TAROCCHI</h2>
+      <h2 class="shop-section-title" data-i18n="shop.sectionTarots">TAROCCHI</h2>
       <div class="shop-row" id="shop-tarots"></div>
     </section>
     <section class="shop-section">
-      <h2 class="shop-section-title">PACCHETTI</h2>
+      <h2 class="shop-section-title" data-i18n="shop.sectionPacks">PACCHETTI</h2>
       <div class="shop-row" id="shop-packs"></div>
     </section>
   </main>
@@ -242,8 +242,8 @@
 <!-- =============== SCHERMATA: SLOT MACHINE =============== -->
 <section id="screen-slot" class="screen">
   <header class="screen-header slot-header">
-    <h1 class="title-neon slot-title">SLOT D' 'O DESTINO</h1>
-    <p class="subtitle">Vire si 'a fortuna te vasa</p>
+    <h1 class="title-neon slot-title" data-i18n="slot.title">SLOT D' 'O DESTINO</h1>
+    <p class="subtitle" data-i18n="slot.subtitle">Vire si 'a fortuna te vasa</p>
   </header>
   <main class="screen-main slot-main">
     <div class="slot-cabinet">
@@ -262,7 +262,7 @@
         <span class="bulb"></span><span class="bulb"></span><span class="bulb"></span>
         <span class="bulb"></span><span class="bulb"></span>
       </div>
-      <div class="slot-display" id="slot-display">INSERISCI 'NU DUCATO</div>
+      <div class="slot-display" id="slot-display" data-i18n="slot.insertCoin">INSERISCI 'NU DUCATO</div>
       <span id="slot-cost-label" class="tombola-counter" style="font-size:16px"></span>
       <button type="button" class="slot-lever" id="btn-slot-spin" aria-label="Tira la leva">
         <span class="lever-stick"></span>
@@ -271,21 +271,21 @@
     </div>
   </main>
   <footer class="screen-footer slot-footer">
-    <span class="slot-credit">CREDITI: <span id="slot-credit">0</span></span>
-    <button type="button" class="btn-arcade" id="btn-slot-exit">ESCI</button>
+    <span class="slot-credit"><span data-i18n="slot.creditsLabel">CREDITI</span>: <span id="slot-credit">0</span></span>
+    <button type="button" class="btn-arcade" id="btn-slot-exit" data-i18n="slot.exit">ESCI</button>
   </footer>
 </section>
 
 <!-- =============== SCHERMATA: TOMBOLA =============== -->
 <section id="screen-tombola" class="screen">
   <header class="screen-header tombola-header">
-    <h1 class="title-neon tombola-title">TOMBOLA D' 'A NONNA</h1>
-    <p class="subtitle">Novanta numeri, 'na speranza</p>
+    <h1 class="title-neon tombola-title" data-i18n="tombola.title">TOMBOLA D' 'A NONNA</h1>
+    <p class="subtitle" data-i18n="tombola.subtitle">Novanta numeri, 'na speranza</p>
   </header>
   <main class="screen-main tombola-main">
     <div class="tombola-grid tombola-card" id="tombola-card" aria-label="Cartella tombola"></div>
     <div class="tombola-extracted">
-      <h3 class="tombola-extracted-title">ULTIMI ESTRATTI</h3>
+      <h3 class="tombola-extracted-title" data-i18n="tombola.lastExtracted">ULTIMI ESTRATTI</h3>
       <div class="tombola-extracted-row" id="tombola-last-numbers"></div>
     </div>
     <span id="tombola-extract-counter" class="tombola-counter">ESTRAZIONI: 0 / 9</span>
@@ -293,7 +293,7 @@
   </main>
   <footer class="screen-footer tombola-footer">
     <span class="tombola-status" id="tombola-status">AMBO --- TERNA --- TOMBOLA</span>
-    <button type="button" class="btn-arcade" id="btn-tombola-exit">ESCI</button>
+    <button type="button" class="btn-arcade" id="btn-tombola-exit" data-i18n="tombola.exit">ESCI</button>
   </footer>
 </section>
 
@@ -304,17 +304,17 @@
   </header>
   <main class="screen-main end-main">
     <section class="end-stats" id="end-stats">
-      <h2 class="end-section-title">STATISTICHE D' 'A RUN</h2>
+      <h2 class="end-section-title" data-i18n="end.statsTitle">STATISTICHE D' 'A RUN</h2>
       <ul class="stat-list">
-        <li>Punteggio finale: <strong id="end-score" class="stat-score-value">0</strong></li>
-        <li>Ante raggiunto: <strong id="end-ante">1</strong></li>
-        <li>Mani giocate: <strong id="end-hands">0</strong></li>
-        <li>Ducati spesi: <strong id="end-spent">0</strong></li>
-        <li>Jolly comprati: <strong id="end-jokers">0</strong></li>
+        <li><span data-i18n="end.statScore">Punteggio finale</span>: <strong id="end-score" class="stat-score-value">0</strong></li>
+        <li><span data-i18n="end.statAnte">Ante raggiunto</span>: <strong id="end-ante">1</strong></li>
+        <li><span data-i18n="end.statHands">Mani giocate</span>: <strong id="end-hands">0</strong></li>
+        <li><span data-i18n="end.statSpent">Ducati spesi</span>: <strong id="end-spent">0</strong></li>
+        <li><span data-i18n="end.statJokers">Jolly comprati</span>: <strong id="end-jokers">0</strong></li>
       </ul>
     </section>
     <section class="end-prediction" id="end-prediction">
-      <h2 class="end-section-title">'O MAGO TE DICE...</h2>
+      <h2 class="end-section-title" data-i18n="end.magoTitle">'O MAGO TE DICE...</h2>
       <div class="prediction-box" id="end-prediction-box">
         <p class="prediction-text" id="end-prediction-text">Le stelle stanno mute, &#39;o mago s&#39;&egrave; addurmuto.</p>
       </div>
@@ -347,7 +347,7 @@
         <span class="settings-value" id="settings-sfx-vol-display">80</span>
       </div>
       <div class="settings-row">
-        <span class="settings-label">Audio</span>
+        <span class="settings-label" data-i18n="settings.audioLabel">Audio</span>
         <button type="button" class="btn-arcade btn-small" id="btn-settings-mute">&#128266; ATTIVO</button>
       </div>
     </section>
@@ -355,7 +355,7 @@
     <section class="settings-section">
       <h2 class="settings-section-title" data-i18n="settings.zodiac">SEGNO ZODIACALE</h2>
       <div class="settings-row settings-zodiac-row">
-        <span class="settings-label">Segno corrente</span>
+        <span class="settings-label" data-i18n="settings.currentSign">Segno corrente</span>
         <span class="settings-zodiac-current">
           <span class="settings-zodiac-symbol" id="settings-zodiac-symbol">&#9804;</span>
           <span class="settings-zodiac-name" id="settings-zodiac-name">--</span>
@@ -388,11 +388,11 @@
     </section>
 
     <section class="settings-section">
-      <h2 class="settings-section-title">DATI</h2>
+      <h2 class="settings-section-title" data-i18n="settings.data">DATI</h2>
       <div class="settings-row">
-        <button type="button" class="btn-arcade btn-small btn-reset-save" id="btn-settings-reset">RESET SALVATAGGIO</button>
+        <button type="button" class="btn-arcade btn-small btn-reset-save" id="btn-settings-reset" data-i18n="settings.reset">RESET SALVATAGGIO</button>
       </div>
-      <p class="settings-warning">Attenzione: cancellera' tutti i progressi, ducati, jolly e statistiche.</p>
+      <p class="settings-warning" data-i18n="settings.resetWarning">Attenzione: cancellera' tutti i progressi, ducati, jolly e statistiche.</p>
     </section>
 
   </main>
@@ -422,34 +422,34 @@
 <section id="screen-minigames" class="screen">
   <div class="screen-inner">
     <header class="screen-header">
-      <button type="button" class="btn-arcade btn-sm" id="btn-minigames-back">&laquo; INDIETRO</button>
-      <h2 class="screen-title">SVAGO</h2>
+      <button type="button" class="btn-arcade btn-sm" id="btn-minigames-back" data-i18n="settings.back">&laquo; INDIETRO</button>
+      <h2 class="screen-title" data-i18n="mg.hub.title">SVAGO</h2>
     </header>
-    <p class="minigames-sub">Quattro juochi 'e bisca pe' fa' passa' 'o tiempo</p>
+    <p class="minigames-sub" data-i18n="mg.hub.subtitle">Quattro juochi 'e bisca pe' fa' passa' 'o tiempo</p>
     <div class="minigames-grid">
       <button type="button" class="minigame-card" id="mg-tabacchi">
         <div class="mg-icon">&#128684;</div>
-        <div class="mg-title">TABACCHI</div>
-        <div class="mg-desc">Fumati tutto il pacchetto</div>
-        <div class="mg-reward">+10 &#128176;</div>
+        <div class="mg-title" data-i18n="mg.tabacchi.cardTitle">TABACCHI</div>
+        <div class="mg-desc" data-i18n="mg.tabacchi.cardDesc">Fumati tutto il pacchetto</div>
+        <div class="mg-reward" data-i18n="mg.tabacchi.cardReward">+10 &#128176;</div>
       </button>
       <button type="button" class="minigame-card" id="mg-cassaforte">
         <div class="mg-icon">&#128274;</div>
-        <div class="mg-title">CASSAFORTE D'ORO</div>
-        <div class="mg-desc">Spaccala col piede di porco</div>
-        <div class="mg-reward">+100 &#128176;</div>
+        <div class="mg-title" data-i18n="mg.cassaforte.cardTitle">CASSAFORTE D'ORO</div>
+        <div class="mg-desc" data-i18n="mg.cassaforte.cardDesc">Spaccala col piede di porco</div>
+        <div class="mg-reward" data-i18n="mg.cassaforte.cardReward">+100 &#128176;</div>
       </button>
       <button type="button" class="minigame-card" id="mg-jackpot">
         <div class="mg-icon">&#127920;</div>
-        <div class="mg-title">JACKPOT</div>
-        <div class="mg-desc">Slot machine — tenta la fortuna</div>
-        <div class="mg-reward">variabile</div>
+        <div class="mg-title" data-i18n="mg.jackpot.cardTitle">JACKPOT</div>
+        <div class="mg-desc" data-i18n="mg.jackpot.cardDesc">Slot machine — tenta la fortuna</div>
+        <div class="mg-reward" data-i18n="mg.jackpot.cardReward">variabile</div>
       </button>
       <button type="button" class="minigame-card" id="mg-pachinko">
         <div class="mg-icon">&#127919;</div>
-        <div class="mg-title">PACHINKO</div>
-        <div class="mg-desc">Spara la pallina e fai punti</div>
-        <div class="mg-reward">5&ndash;50 &#128176;</div>
+        <div class="mg-title" data-i18n="mg.pachinko.cardTitle">PACHINKO</div>
+        <div class="mg-desc" data-i18n="mg.pachinko.cardDesc">Spara la pallina e fai punti</div>
+        <div class="mg-reward" data-i18n="mg.pachinko.cardReward">5&ndash;50 &#128176;</div>
       </button>
     </div>
   </div>

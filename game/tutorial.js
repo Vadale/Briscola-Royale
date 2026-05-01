@@ -21,8 +21,38 @@
   let _tooltipEl = null;
   let _demoRun = null; // snapshot del run reale salvato mentre tutorial è attivo
   let _resizeHandler = null;
+  let _steps = []; // popolato in _setup() via _buildSteps()
 
   const TOTAL_STEPS = 13;
+
+  // ============================================================
+  // i18n SHIM — fallback se window.t non e' ancora pronto
+  // ============================================================
+  function _t(key) {
+    return (typeof window.t === 'function') ? window.t(key) : String(key);
+  }
+
+  // ============================================================
+  // BUILD STEPS — ricostruito ogni volta che il tutorial parte,
+  // cosi' i testi seguono la lingua corrente (STATE.meta.lang).
+  // ============================================================
+  function _buildSteps() {
+    return [
+      { target: '#screen-game',                                         title: _t('tut.step0.title'),  text: _t('tut.step0.text'),  position: 'center' },
+      { target: '#hud',                                                 title: _t('tut.step1.title'),  text: _t('tut.step1.text'),  position: 'bottom' },
+      { target: '#deck-area, .deck-area, #btn-draw-card',               title: _t('tut.step2.title'),  text: _t('tut.step2.text'),  position: 'right'  },
+      { target: '#cards-hand, .hand-area',                              title: _t('tut.step3.title'),  text: _t('tut.step3.text'),  position: 'top'    },
+      { target: '#cards-hand, .hand-area',                              title: _t('tut.step4.title'),  text: _t('tut.step4.text'),  position: 'top'    },
+      { target: '#round-info, #hand-type-display, #chips-mult-display', title: _t('tut.step5.title'),  text: _t('tut.step5.text'),  position: 'bottom' },
+      { target: '#hud-briscola, #hud-round',                            title: _t('tut.step6.title'),  text: _t('tut.step6.text'),  position: 'bottom' },
+      { target: '#btn-play',                                            title: _t('tut.step7.title'),  text: _t('tut.step7.text'),  position: 'top'    },
+      { target: '#btn-discard',                                         title: _t('tut.step8.title'),  text: _t('tut.step8.text'),  position: 'top'    },
+      { target: '#btn-combo-help',                                      title: _t('tut.step9.title'),  text: _t('tut.step9.text'),  position: 'top'    },
+      { target: '#joker-bar, .joker-bar',                               title: _t('tut.step10.title'), text: _t('tut.step10.text'), position: 'left'   },
+      { target: '.hud-score, #hud-target',                              title: _t('tut.step11.title'), text: _t('tut.step11.text'), position: 'bottom' },
+      { target: null,                                                   title: _t('tut.step12.title'), text: _t('tut.step12.text'), position: 'center' },
+    ];
+  }
 
   // ============================================================
   // PARTITA DEMO — mano fissa, stessa ogni volta.
@@ -74,92 +104,6 @@
   };
 
   // ============================================================
-  // STEP DEFINITIONS
-  // target: stringa CSS selector (anche multi, separata da virgola)
-  // position: 'top' | 'bottom' | 'left' | 'right' | 'center'
-  // ============================================================
-  const STEPS = [
-    {
-      target: '#screen-game',
-      title: 'BENVENUTO!',
-      text: 'Questo è il tavolo da gioco di Briscola Royale. Ti spiego tutto in 13 passi. Dai, è facile!',
-      position: 'center',
-    },
-    {
-      target: '#hud',
-      title: "L'HUD",
-      text: "Qui vedi tutto: Ante (difficoltà), Round (Small/Big/Boss), il tuo Punteggio e l'Obiettivo da raggiungere, le Mani rimaste, gli Scarti e i tuoi Ducati.",
-      position: 'bottom',
-    },
-    {
-      target: '#deck-area, .deck-area, #btn-draw-card',
-      title: 'IL MAZZO',
-      text: 'Queste sono le carte che puoi ancora pescare. Il mazzo si rimescola da solo quando finisce!',
-      position: 'right',
-    },
-    {
-      target: '#cards-hand, .hand-area',
-      title: 'LA TUA MANO',
-      text: 'Queste sono le tue carte. Cliccale per selezionarle. Puoi selezionarne fino a 5 alla volta.',
-      position: 'top',
-    },
-    {
-      target: '#cards-hand, .hand-area',
-      title: 'LE COMBO',
-      text: 'Quando selezioni più carte, vedi subito che combo formi. Scegli le carte giuste per fare la combo più forte!',
-      position: 'top',
-    },
-    {
-      target: '#round-info, #hand-type-display, #chips-mult-display',
-      title: 'CHIPS × MOLTIPLICATORE',
-      text: 'Qui vedi la preview: CHIPS × MULT. Il tuo punteggio finale sarà esattamente chips moltiplicato per mult. Più è grande, meglio è!',
-      position: 'bottom',
-    },
-    {
-      target: '#hud-briscola, #hud-round',
-      title: 'IL SEME BRISCOLA',
-      text: 'Ogni round ha un seme briscola, indicato qui in HUD. Ogni carta di quel seme vale +5 chips extra. Tienilo sempre a mente!',
-      position: 'bottom',
-    },
-    {
-      target: '#btn-play',
-      title: 'BOTTONE GIOCA',
-      text: 'Quando sei soddisfatto delle carte selezionate, premi GIOCA per segnare i punti. Scegli bene!',
-      position: 'top',
-    },
-    {
-      target: '#btn-discard',
-      title: 'BOTTONE SCARTA',
-      text: 'Se le carte non ti convincono, scartale e pescane di nuove. Ma attenzione: gli scarti sono limitati!',
-      position: 'top',
-    },
-    {
-      target: '#btn-combo-help',
-      title: 'LISTA COMBO',
-      text: 'Premi COMBO? per vedere tutte le combinazioni possibili con esempi. Tienila a mente per costruire la strategia giusta!',
-      position: 'top',
-    },
-    {
-      target: '#joker-bar, .joker-bar',
-      title: 'I MAZZETTI (JOLLY)',
-      text: "I Mazzetti sono le tue carte speciali! Ogni mano li vedi attivarsi con bonus automatici. Comprane di nuovi nel negozio tra un round e l'altro.",
-      position: 'left',
-    },
-    {
-      target: '.hud-score, #hud-target',
-      title: "L'OBIETTIVO",
-      text: 'Devi raggiungere il punteggio obiettivo entro le mani disponibili. Vinci il blind → vai al negozio → round successivo. Semplice, no?',
-      position: 'bottom',
-    },
-    {
-      target: null,
-      title: 'SEI PRONTO!',
-      text: 'Ora sai tutto quello che ti serve, guagliò! Buona fortuna — e ricorda: Gennarino ci crede in te!',
-      position: 'center',
-    },
-  ];
-
-  // ============================================================
   // UTILITY: trova il primo elemento che matcha una lista CSV di selettori
   // ============================================================
   function _findEl(selectorList) {
@@ -209,7 +153,7 @@
   }
 
   function _renderStep(stepIdx) {
-    const step = STEPS[stepIdx];
+    const step = _steps[stepIdx];
     if (!step || !_tooltipEl) return;
 
     // 1. Spotlight: muovi il ritaglio sull'elemento target
@@ -224,12 +168,12 @@
       '<div class="tut-title">' + _esc(step.title) + '</div>' +
       '<div class="tut-text">' + _esc(step.text) + '</div>' +
       '<div class="tut-buttons">' +
-        (!isFirst ? '<button type="button" class="btn-arcade btn-small tut-prev" id="tut-btn-prev">&#9664; INDIETRO</button>' : '') +
+        (!isFirst ? '<button type="button" class="btn-arcade btn-small tut-prev" id="tut-btn-prev">' + _esc(_t('tut.prev')) + '</button>' : '') +
         (isLast
-          ? '<button type="button" class="btn-arcade tut-finish" id="tut-btn-finish">INIZIA A GIOCARE!</button>'
-          : '<button type="button" class="btn-arcade btn-small tut-next" id="tut-btn-next">AVANTI &#9654;</button>'
+          ? '<button type="button" class="btn-arcade tut-finish" id="tut-btn-finish">' + _esc(_t('tut.finish')) + '</button>'
+          : '<button type="button" class="btn-arcade btn-small tut-next" id="tut-btn-next">' + _esc(_t('tut.next')) + '</button>'
         ) +
-        '<button type="button" class="btn-arcade btn-small tut-skip" id="tut-btn-skip">SALTA TUTORIAL</button>' +
+        '<button type="button" class="btn-arcade btn-small tut-skip" id="tut-btn-skip">' + _esc(_t('tut.skip')) + '</button>' +
       '</div>' +
       '<div class="tut-progress">' + (stepIdx + 1) + ' / ' + TOTAL_STEPS + '</div>';
 
@@ -374,6 +318,9 @@
   // SETUP / TEARDOWN
   // ============================================================
   function _setup() {
+    // 0. Costruisci gli step nella lingua corrente (ricostruiti ad ogni start)
+    _steps = _buildSteps();
+
     // 1. Salva il run reale (se esiste) — verrà ripristinato in teardown
     _demoRun = (window.STATE && 'currentRun' in STATE) ? STATE.currentRun : null;
 
