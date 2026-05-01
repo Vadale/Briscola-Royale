@@ -54,7 +54,17 @@
   function _getBonusDesc(sign) {
     const bonuses = (typeof window !== 'undefined' && window.ZODIAC_BONUSES) || (typeof ZODIAC_BONUSES !== 'undefined' ? ZODIAC_BONUSES : null);
     if (!bonuses || !Object.prototype.hasOwnProperty.call(bonuses, sign)) return '';
+    const lang = window.STATE && STATE.meta && STATE.meta.lang;
+    if (lang === 'en' && bonuses[sign].descEn) return bonuses[sign].descEn;
     return bonuses[sign].desc || '';
+  }
+
+  function _getZodiacLabel(sign) {
+    if (typeof window.t === 'function') {
+      const translated = window.t('zodiac.sign.' + sign);
+      if (translated && translated !== 'zodiac.sign.' + sign) return translated.toUpperCase();
+    }
+    return ZODIAC_LABELS[sign] || (sign || '').toUpperCase();
   }
 
   function _getPredictionText(sign, isVictory) {
@@ -72,6 +82,7 @@
   }
 
   function _getString(key, fallback) {
+    if (typeof window.t === 'function') return window.t(key) || fallback;
     if (typeof STRINGS !== 'undefined' && STRINGS && STRINGS.it && STRINGS.it[key] != null) return STRINGS.it[key];
     return fallback;
   }
@@ -138,7 +149,7 @@
 
     const title = _getString('predictionTitle', "🔮 'O MAGO HA PARLATO 🔮");
     const acceptLbl = _getString('predictionAccept', 'ACCETTO IL MIO DESTINO');
-    const label = ZODIAC_LABELS[sign] || sign.toUpperCase();
+    const label = _getZodiacLabel(sign);
     const text = _getPredictionText(sign, !!isVictory);
 
     const html = [
@@ -146,7 +157,7 @@
         '<div class="mago-stars">★ ✦ ☆ ✦ ★ ✦ ☆ ✦ ★</div>',
         '<h2 class="mago-title">', _escape(title), '</h2>',
         '<div class="mago-portrait">', _magoSVG(), '</div>',
-        '<p class="mago-intro"><em>Le stelle guardano ', _escape(label), '...</em></p>',
+        '<p class="mago-intro"><em>' + _escape(_getString('zodiac.starsWatch', 'Le stelle guardano')) + ' ' + _escape(label) + '...</em></p>',
         '<div class="mago-text-box">',
           '<p class="mago-text" id="mago-prediction-text"></p>',
         '</div>',
@@ -179,7 +190,7 @@
     const safeSign = _validSign(sign);
     if (!safeSign) { detail.textContent = ''; return; }
     const symbol = ZODIAC_SYMBOLS[safeSign] || '★';
-    const label = ZODIAC_LABELS[safeSign] || safeSign.toUpperCase();
+    const label = _getZodiacLabel(safeSign);
     const desc = _getBonusDesc(safeSign);
     detail.innerHTML = [
       '<div class="zodiac-detail-card">',

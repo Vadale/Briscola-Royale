@@ -9,6 +9,18 @@
    - Tutti i testi dinamici passano per _escape().
    ============================================================ */
 
+// i18n helpers per joker/mazzetti/tarocchi
+function _jName(obj) {
+  const lang = window.STATE && STATE.meta && STATE.meta.lang;
+  if (lang === 'en' && obj && obj.nameEn) return obj.nameEn;
+  return (obj && obj.name) || '';
+}
+function _jDesc(obj) {
+  const lang = window.STATE && STATE.meta && STATE.meta.lang;
+  if (lang === 'en' && obj && obj.descriptionEn) return obj.descriptionEn;
+  return (obj && obj.description) || '';
+}
+
 // ============================================================
 // STATO MODULO
 // ============================================================
@@ -253,8 +265,8 @@ function renderShop() {
       return `
         <div class="${cls.join(' ')}" data-shop-type="joker" data-shop-idx="${idx}" role="button" tabindex="0">
           <div class="shop-item-art">${_renderJokerCardSprite(j)}</div>
-          <div class="shop-item-name">${_escape(j.name)}</div>
-          <div class="shop-item-desc">${_escape(j.description)}</div>
+          <div class="shop-item-name">${_escape(_jName(j))}</div>
+          <div class="shop-item-desc">${_escape(_jDesc(j))}</div>
           <div class="shop-item-rarity rarity-${_escape(j.rarity)}">${_escape((j.rarity || '').toUpperCase())}</div>
           ${priceLabel}
         </div>`;
@@ -276,8 +288,8 @@ function renderShop() {
       return `
         <div class="${cls.join(' ')}" data-shop-type="tarot" data-shop-idx="${idx}" role="button" tabindex="0">
           <div class="shop-item-art shop-tarot-emoji">${_escape(t.emoji || '🔮')}</div>
-          <div class="shop-item-name">${_escape(t.name)}</div>
-          <div class="shop-item-desc">${_escape(t.description)}</div>
+          <div class="shop-item-name">${_escape(_jName(t))}</div>
+          <div class="shop-item-desc">${_escape(_jDesc(t))}</div>
           <span class="shop-price">$${it.price}</span>
         </div>`;
     }).join('');
@@ -398,9 +410,9 @@ function _showJokerSwapPopup(newItem, shopIdx, shopType) {
     const staticDef = window.JOKERS ? (JOKERS.find(jd => jd.id === j.id) || j) : j;
     return `<div class="joker-swap-slot">
       <div class="joker-swap-info">
-        <strong>${_escape(j.name)}</strong>
+        <strong>${_escape(_jName(staticDef))}</strong>
         <span class="joker-swap-rarity rarity-${_escape(j.rarity)}">${_escape((j.rarity || '').toUpperCase())}</span>
-        <small>${_escape(j.description || '')}</small>
+        <small>${_escape(_jDesc(staticDef))}</small>
       </div>
       <button class="btn-arcade btn-small btn-discard" data-sell-idx="${i}">VENDI</button>
     </div>`;
@@ -409,8 +421,8 @@ function _showJokerSwapPopup(newItem, shopIdx, shopType) {
   const html = `<div class="joker-swap-popup">
     <h3>SLOT JOLLY PIENI!</h3>
     <div class="joker-swap-new">
-      <p>Nuovo jolly: <strong>${_escape(newJoker.name)}</strong></p>
-      <p>${_escape(newJoker.description || '')}</p>
+      <p>Nuovo jolly: <strong>${_escape(_jName(newJoker))}</strong></p>
+      <p>${_escape(_jDesc(newJoker))}</p>
     </div>
     <p class="swap-hint">Vendi un jolly per fare spazio (nessun rimborso):</p>
     <p style="color:#e63946;font-size:9px;font-family:var(--font-pixel)">💸 VALORE: 0 ducati (nessun rimborso)</p>
@@ -720,7 +732,7 @@ function _animateLootboxOpen(tier, drawn) {
         <div class="lootbox-card-reveal rarity-${_escape(d.rarity)}"
              style="animation-delay:${i*300}ms; border-color:${_escape(borderColor)}">
           <div class="lootbox-card-art">${sprite}</div>
-          <div class="lootbox-card-name">${_escape(d.joker.name)}</div>
+          <div class="lootbox-card-name">${_escape(_jName(d.joker))}</div>
           <div class="lootbox-card-rarity">${_escape(d.rarity.toUpperCase())}</div>
         </div>`;
     }).join('');

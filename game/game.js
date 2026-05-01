@@ -8,6 +8,18 @@
    - Tutti i numeri da BALANCE. Niente magic numbers.
    ============================================================ */
 
+// i18n helpers per joker/mazzetti — usano nameEn/descriptionEn quando lang='en'
+function _jName(obj) {
+  const lang = window.STATE && STATE.meta && STATE.meta.lang;
+  if (lang === 'en' && obj && obj.nameEn) return obj.nameEn;
+  return (obj && obj.name) || '';
+}
+function _jDesc(obj) {
+  const lang = window.STATE && STATE.meta && STATE.meta.lang;
+  if (lang === 'en' && obj && obj.descriptionEn) return obj.descriptionEn;
+  return (obj && obj.description) || '';
+}
+
 const SEMI_LIST = ['bastoni', 'coppe', 'denari', 'spade'];
 const BOSS_RULES_RANDOM_POOL = [
   'no_discard', 'half_denari', 'less_hands', 'no_figure_bonus',
@@ -692,7 +704,7 @@ function updatePreview() {
   const [comboChips, comboMult] = BALANCE.combos[combo] || [0, 1];
   let chips = comboChips;
   cards.forEach(c => { chips += BALANCE.cardChips[c.valore] || 0; });
-  if (handTypeEl) handTypeEl.textContent = (STRINGS.it[combo] || combo).toUpperCase();
+  if (handTypeEl) handTypeEl.textContent = (t(combo) || combo).toUpperCase();
   if (chipsEl) chipsEl.textContent = `${chips} × ${comboMult}`;
 }
 
@@ -1184,7 +1196,7 @@ function renderJokerBar() {
   if (!slotsEl) return;
 
   if (run.jokers.length === 0) {
-    slotsEl.innerHTML = '<div class="joker-slot-empty">Nessun jolly</div>';
+    slotsEl.innerHTML = '<div class="joker-slot-empty">' + _escape(t('game.noJokers')) + '</div>';
     return;
   }
 
@@ -1209,15 +1221,19 @@ function renderConsumableBar() {
   const barEl = document.getElementById('consumable-bar');
   if (!barEl) return;
   if (!run || !Array.isArray(run.consumables) || run.consumables.length === 0) {
-    barEl.innerHTML = '<div class="consumable-empty">Nessun tarocco</div>';
+    barEl.innerHTML = '<div class="consumable-empty">' + _escape(t('game.noTarots')) + '</div>';
     return;
   }
-  barEl.innerHTML = run.consumables.map((c, idx) => `
+  barEl.innerHTML = run.consumables.map((c, idx) => {
+    const staticDef = window.TAROTS ? TAROTS.find(td => td.id === c.id) : null;
+    const display = staticDef || c;
+    return `
     <div class="consumable-slot" data-consumable-idx="${idx}" role="button" tabindex="0"
-         title="${_escape(c.description || '')}">
+         title="${_escape(_jDesc(display))}">
       <div class="consumable-emoji">${_escape(c.emoji || '🔮')}</div>
-      <div class="consumable-name">${_escape(c.name)}</div>
-    </div>`).join('');
+      <div class="consumable-name">${_escape(_jName(display))}</div>
+    </div>`;
+  }).join('');
 }
 
 function useTarot(idx) {
@@ -1359,19 +1375,23 @@ function showRunInfo() {
   const run = STATE.currentRun;
   if (!run) return;
   const jokerList = run.jokers.length === 0
-    ? '<li>Nessun jolly</li>'
-    : run.jokers.map(j => `<li><strong>${_escape(j.name)}</strong> — ${_escape(j.description)}</li>`).join('');
-  const html = `
-    <div class="run-info">
-      <h3>INFO RUN</h3>
-      <p>Ante: <strong>${run.ante}/8</strong> — ${_escape(run.blind.toUpperCase())}</p>
-      <p>Punteggio totale: <strong>${run.runScore.toLocaleString('it-IT')}</strong></p>
-      <p>Ducati: <strong>$${run.money}</strong></p>
-      <p>Briscola: <strong>${run.briscolaSeme}</strong></p>
-      <h4>Jolly attivi:</h4>
-      <ul>${jokerList}</ul>
-      <button class="btn-arcade" data-popup-close="ok">CHIUDI</button>
-    </div>`;
+    ? '<li>' + _escape(t('runinfo.none')) + '</li>'
+    : run.jokers.map(j => {
+        const staticDef = window.JOKERS ? JOKERS.find(jd => jd.id === j.id) : null;
+        const displayJ = staticDef || j;
+        return '<li><strong>' + _escape(_jName(displayJ)) + '</strong> — ' + _escape(_jDesc(displayJ)) + '</li>';
+      }).join('');
+  const html =
+    '<div class="run-info">' +
+      '<h3>' + _escape(t('runinfo.title')) + '</h3>' +
+      '<p>' + _escape(t('runinfo.ante')) + ': <strong>' + run.ante + '/8</strong> — ' + _escape(run.blind.toUpperCase()) + '</p>' +
+      '<p>' + _escape(t('runinfo.score')) + ': <strong>' + run.runScore.toLocaleString() + '</strong></p>' +
+      '<p>' + _escape(t('runinfo.ducats')) + ': <strong>$' + run.money + '</strong></p>' +
+      '<p>' + _escape(t('runinfo.trump')) + ': <strong>' + _escape(run.briscolaSeme) + '</strong></p>' +
+      '<h4>' + _escape(t('runinfo.jokersTitle')) + ':</h4>' +
+      '<ul>' + jokerList + '</ul>' +
+      '<button class="btn-arcade" data-popup-close="ok">' + _escape(t('runinfo.close')) + '</button>' +
+    '</div>';
   popup(html);
 }
 
@@ -1425,12 +1445,15 @@ function wireGameButtons() {
       const idx = parseInt(slot.dataset.jokerIdx, 10);
       const j = run.jokers[idx];
       if (!j) return;
+      const staticDefJ = window.JOKERS ? JOKERS.find(jd => jd.id === j.id) : null;
+      const displayJ2 = staticDefJ || j;
+      const rarityKey = 'rarity.' + (j.rarity || 'common');
       const html = `
         <div class="joker-info">
-          <h3>${_escape(j.name)} ${_escape(j.emoji || '')}</h3>
-          <p class="joker-rarity">${_escape((j.rarity || '').toUpperCase())}</p>
-          <p>${_escape(j.description)}</p>
-          <p class="joker-trigger">Trigger: <em>${_escape(j.trigger)}</em></p>
+          <h3>${_escape(_jName(displayJ2))} ${_escape(j.emoji || '')}</h3>
+          <p class="joker-rarity">${_escape(t(rarityKey) || (j.rarity || '').toUpperCase())}</p>
+          <p>${_escape(_jDesc(displayJ2))}</p>
+          <p class="joker-trigger">${_escape(t('joker.triggerLabel'))}: <em>${_escape(j.trigger)}</em></p>
           <button class="btn-arcade" data-popup-close="ok">OK</button>
         </div>`;
       popup(html);
@@ -1449,13 +1472,15 @@ function wireGameButtons() {
       if (!Number.isInteger(cidx)) return;
       const c = run.consumables && run.consumables[cidx];
       if (!c) return;
+      const staticDefT = window.TAROTS ? TAROTS.find(td => td.id === c.id) : null;
+      const displayT = staticDefT || c;
       const h = `<div class="tarot-use-popup">
         <div class="tarot-use-emoji">${_escape(c.emoji || '🔮')}</div>
-        <h3>${_escape(c.name)}</h3>
-        <p>${_escape(c.description || '')}</p>
+        <h3>${_escape(_jName(displayT))}</h3>
+        <p>${_escape(_jDesc(displayT))}</p>
         <div class="tarot-popup-btns">
-          <button class="btn-arcade" data-popup-close="use">USA ADESSO</button>
-          <button class="btn-arcade btn-small" data-popup-close="cancel">ANNULLA</button>
+          <button class="btn-arcade" data-popup-close="use">${_escape(t('tarot.use'))}</button>
+          <button class="btn-arcade btn-small" data-popup-close="cancel">${_escape(t('btn.cancel'))}</button>
         </div>
       </div>`;
       popup(h).then(val => { if (val === 'use') useTarot(cidx); });
@@ -1499,21 +1524,21 @@ function wireGameButtons() {
       const card = (val, seme) =>
         `<span class="cmini cmini-${seme}">${val}${SUIT_SVG[seme]}</span>`;
 
-      // Esempi statici per ogni combo (hardcoded dallo sviluppatore)
+      // Esempi statici per ogni combo (mini-carte SVG hardcoded)
       const COMBO_EXAMPLES = {
-        single:         { cards: [card('4','den')],                                                    desc: 'qualsiasi carta singola' },
-        coppia:         { cards: [card('7','den'), card('7','cup')],                                   desc: '2 carte stesso valore' },
-        tris:           { cards: [card('3','den'), card('3','cup'), card('3','spa')],                   desc: '3 carte stesso valore' },
-        poker:          { cards: [card('5','den'), card('5','cup'), card('5','spa'), card('5','bas')],  desc: '4 carte stesso valore' },
-        sette_e_mezzo:  { cards: [card('4','den'), card('3','cup')],                                   desc: '2 carte, somma ≤ 7.5 (figure = 0.5)' },
-        bazzica:        { cards: [card('5','den'), card('6','cup'), card('7','spa')],                   desc: '5-6-7 di semi diversi' },
-        briscola_reale: { cards: [card('A','den'), card('7','den')],                                   desc: 'Asso + carte del seme briscola' },
-        carico:         { cards: [card('F','bas'), card('C','bas'), card('R','bas')],                   desc: 'F+C+R stesso seme' },
-        napola_mista:   { cards: [card('A','den'), card('2','cup'), card('3','spa')],                   desc: 'A+2+3 semi diversi' },
-        napoletana:     { cards: [card('A','spa'), card('2','spa'), card('3','spa')],                   desc: 'A+2+3 stesso seme' },
-        calabresella:   { cards: [card('R','den'), card('C','spa'), card('A','bas')],                   desc: 'R+C+A di 3 semi diversi' },
-        primiera:       { cards: [card('7','den'), card('6','cup'), card('5','spa'), card('4','bas')],  desc: '4 carte di 4 semi diversi' },
-        scopa:          { cards: [card('A','den'), card('2','den'), card('3','den'), card('4','den'), card('5','den')], desc: '5 carte stesso seme' },
+        single:         { cards: [card('4','den')] },
+        coppia:         { cards: [card('7','den'), card('7','cup')] },
+        tris:           { cards: [card('3','den'), card('3','cup'), card('3','spa')] },
+        poker:          { cards: [card('5','den'), card('5','cup'), card('5','spa'), card('5','bas')] },
+        sette_e_mezzo:  { cards: [card('4','den'), card('3','cup')] },
+        bazzica:        { cards: [card('5','den'), card('6','cup'), card('7','spa')] },
+        briscola_reale: { cards: [card('A','den'), card('7','den')] },
+        carico:         { cards: [card('F','bas'), card('C','bas'), card('R','bas')] },
+        napola_mista:   { cards: [card('A','den'), card('2','cup'), card('3','spa')] },
+        napoletana:     { cards: [card('A','spa'), card('2','spa'), card('3','spa')] },
+        calabresella:   { cards: [card('R','den'), card('C','spa'), card('A','bas')] },
+        primiera:       { cards: [card('7','den'), card('6','cup'), card('5','spa'), card('4','bas')] },
+        scopa:          { cards: [card('A','den'), card('2','den'), card('3','den'), card('4','den'), card('5','den')] },
       };
       const COMBO_ORDER = [
         'single','coppia','tris','poker','sette_e_mezzo','bazzica',
@@ -1523,28 +1548,28 @@ function wireGameButtons() {
         const vals = BALANCE.combos[id];
         if (!vals) return '';
         const [chips, mult] = vals;
-        const label = (window.STRINGS && STRINGS.it && STRINGS.it[id]) || id;
-        const info = COMBO_EXAMPLES[id] || { cards: ['—'], desc: '' };
+        const label = t(id) || id;
+        const info = COMBO_EXAMPLES[id] || { cards: ['—'] };
         return `<tr>
           <td class="combo-name">${_escape(label.toUpperCase())}</td>
           <td class="combo-ex">${info.cards.join('')}</td>
           <td class="combo-chips">+${chips}</td>
           <td class="combo-mult">×${mult}</td>
-          <td class="combo-desc">${_escape(info.desc)}</td>
+          <td class="combo-desc">${_escape(t('combo.desc.' + id) || '')}</td>
         </tr>`;
       }).join('');
       const h = `<div class="combo-help">
-        <h3>LE COMBO</h3>
+        <h3>${_escape(t('combo.popupTitle'))}</h3>
         <div class="combo-scroll">
           <table class="combo-table">
             <thead><tr>
-              <th>COMBO</th><th>ESEMPIO</th><th>CHIPS</th><th>×</th><th>COME SI FA</th>
+              <th>${_escape(t('combo.colCombo'))}</th><th>${_escape(t('combo.colExample'))}</th><th>${_escape(t('combo.colChips'))}</th><th>${_escape(t('combo.colMult'))}</th><th>${_escape(t('combo.colHow'))}</th>
             </tr></thead>
             <tbody>${rows}</tbody>
           </table>
         </div>
-        <p class="combo-tip">💡 Napoletana, Scopa e Carico danno i punteggi più alti!</p>
-        <button class="btn-arcade" data-popup-close="ok">CAPITO!</button>
+        <p class="combo-tip">${_escape(t('combo.tip'))}</p>
+        <button class="btn-arcade" data-popup-close="ok">${_escape(t('combo.ok'))}</button>
       </div>`;
       popup(h);
     });

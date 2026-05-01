@@ -1,5 +1,66 @@
 # Changelog — BRISCOLA ROYALE
 
+## 2026-05-02 01:07 — Copertura i18n IT/EN completa
+
+**Agente**: coder
+
+### Cosa è stato fatto
+- Aggiunte ~80 nuove chiavi i18n in `STRINGS.it` e `STRINGS.en` (data.js):
+  zodiac (titolo, sottotitolo, conferma, 12 segni), menu (subtitle, label ducati/segno),
+  game (jolly, tarocchi, carte, pescate, daily/endless), shop (titolo principale e sezioni),
+  slot (titolo, insertCoin, crediti, exit), tombola (titolo, lastExtracted, exit),
+  end (statsTitle, statScore/Ante/Hands/Spent/Jokers, magoTitle), settings (audioLabel,
+  currentSign, data, resetWarning), mini-games hub (4 card title/desc/reward, back, subtitle),
+  run mode popup (run.random, run.daily), abandon popup (abandon.confirm, abandon.yes,
+  btn.cancel), tutorial (13 step.title + step.text + prev/next/finish/skip).
+- `index.html`: aggiunti attributi `data-i18n` a tutti gli elementi statici delle 8
+  schermate (zodiac, menu, game, shop, slot, tombola, end, settings, minigames).
+  I testi italiani originali sono stati conservati come fallback HTML — `applyLang()`
+  li sovrascrive via `textContent` quando la lingua cambia.
+- `tutorial.js`: rimosso array statico `STEPS` con testi hardcoded; aggiunta funzione
+  `_buildSteps()` che ricostruisce i 13 step con `t()` ad ogni `_setup()`. Variabile
+  modulo `_steps = []` popolata in setup, usata da `_renderStep`. I bottoni
+  prev/next/finish/skip ora usano `_t('tut.prev')` ecc. con shim `_t()` di sicurezza.
+- `app.js`:
+  - `_promptRunMode()`: bottoni CASUALE / DAILY / ANNULLA → `t('run.random')`,
+    `t('run.daily')`, `t('btn.cancel')`.
+  - Popup abbandona run: titolo, conferma, bottoni → `t('btn.abandon')`,
+    `t('abandon.confirm')`, `t('abandon.yes')`, `t('btn.cancel')`.
+  - `setMute()` e `populateSettings()`: testo bottoni mute → `t('settings.mute')` /
+    `t('settings.unmute')`.
+  - `applyLang()`: aggiornamento extra dei bottoni `btn-mute` e `btn-settings-mute`
+    (testo dinamico non gestito da `data-i18n` perché contiene icona + label).
+  - `confirm()` di reset salvataggio → `t('settings.resetWarning')`.
+
+### File modificati
+- `/Users/alessandrovadala/Desktop/creatività/game/data.js`
+- `/Users/alessandrovadala/Desktop/creatività/game/index.html`
+- `/Users/alessandrovadala/Desktop/creatività/game/tutorial.js`
+- `/Users/alessandrovadala/Desktop/creatività/game/app.js`
+
+### Sicurezza & regole
+- Nessuna logica di gioco, audio, layout o save toccati.
+- Tutti i testi originali italiani conservati come fallback HTML (zero rischi di
+  blank UI se data.js fallisse il load).
+- `applyLang()` continua a usare `textContent` (no XSS via innerHTML).
+- I testi tutorial vengono escapati con `_esc()` come prima.
+- Lo shim `_t()` in tutorial.js gestisce il caso in cui `window.t` non sia ancora
+  pronto (graceful fallback alla key).
+
+### Verifiche / security check da eseguire
+- `node --check` su `data.js`, `app.js`, `tutorial.js` → PASSA (verificato).
+- Verificare manualmente: switch IT→EN dal pulsante lingua aggiorna tutti gli elementi
+  statici delle 8 schermate, inclusi nomi zodiacali, label HUD (carte, pescate, jolly,
+  tarocchi), titoli di sezione shop, titoli mini-games card.
+- Verificare che il popup CASUALE/DAILY e quello "Abbandona run" mostrino testo EN.
+- Verificare che il tutorial parta in EN se la lingua è EN (testi step + bottoni).
+- Verificare che i bottoni `btn-mute` (top-right) e `btn-settings-mute` cambino label
+  quando si fa toggle lingua (non solo quando si clicca mute).
+- Verificare che il fallback IT funzioni se una chiave EN dovesse mancare (logica
+  esistente in `t()` che fa fallback a STRINGS.it).
+
+---
+
 ## 2026-05-01 — Daily Seed + Endless Mode + Slot fuori run
 
 **Agente**: coder
@@ -987,3 +1048,44 @@ Implementati 10 easter egg con riferimenti alla cultura pop italiana trash/pop, 
 - Verificare con tastiera ITALIANA: la digitazione di "pizza" / "fantozzi" / "baggio" / "totti" / "maancheno" / "allegria" deve attivare l'egg.
 - Verificare che il debug popup non sia raggiungibile durante una run attiva tramite click sul logo (è in screen-menu, ma il listener resta attivo: questo è intenzionale, è un debug tool).
 - Mobile: verificare che 10 click consecutivi sul logo funzionino anche con tap touch (event 'click' è generato anche su touch).
+
+---
+
+## 2026-05-02 01:35 — i18n coverage completion (Coder)
+
+### Cosa è stato fatto
+Completata la copertura i18n per joker, mazzetti, tarocchi, zodiac bonuses, popup runtime (run info, joker info, tarot use, combo help) e stat labels in HTML.
+
+### File modificati
+- `game/data.js`
+  - FIX 1 — `BALANCE.cardChips` aggiornato: re=10 (era 4), cavallo=9 (era 3), fante=8 (era 2). Asso/3 invariati (11/10).
+  - FIX 2 — Aggiunto `nameEn` e `descriptionEn` a tutti i 28 JOKERS (cornicello, caffe_forte, baba, sfogliatella, pizzaiolo, tarallo, limoncello, sigaro_toscano, zampogna, amuleto_zia, pesce_oro, re_cafone, smorfia_joker, sfortuna, munaciello_buono, mano_nera, sangue_napoli, briscola_cavalcata, corno_iellato, alba_napoletana, pizza_fritta, diavolo, tarantella, mago_alchimista, campana_gennaro, cuoppo_fritto, maradona_dieci, vesuvio_eruzione).
+  - FIX 2 — Aggiunto `nameEn` e `descriptionEn` a tutti i 20 MAZZETTI.
+  - FIX 2 — Aggiunto `nameEn` e `descriptionEn` a tutti i 10 TAROTS (mago, imperatrice, ruota, sole, luna, torre, stelle, giudizio, forza, papessa).
+  - FIX 3 — Aggiunto `descEn` a tutti i 12 ZODIAC_BONUSES.
+  - FIX 4 — Aggiunte chiavi STRINGS in IT e EN: `game.noJokers`, `game.noTarots`, `runinfo.*` (title/ante/score/ducats/trump/jokersTitle/none/close), `joker.triggerLabel`, `tarot.use`, `rarity.*` (common/uncommon/rare/legendary), `combo.popupTitle`, `combo.colCombo/colExample/colChips/colMult/colHow`, `combo.tip`, `combo.ok`, `combo.desc.*` (13 combo descriptions), `zodiac.starsWatch`.
+- `game/game.js`
+  - FIX 5 — Aggiunti helper `_jName()` e `_jDesc()` all'inizio del file per leggere `nameEn`/`descriptionEn` quando `STATE.meta.lang === 'en'`.
+  - FIX 6a — Sostituito `STRINGS.it[combo]` con `t(combo)` in updatePreview hand type.
+  - FIX 6b — `renderJokerBar()` "Nessun jolly" → `t('game.noJokers')`.
+  - FIX 6c — `renderConsumableBar()` "Nessun tarocco" → `t('game.noTarots')`. Inoltre titolo/descrizione tarocchi in barra ora usano `_jName/_jDesc` con lookup statico TAROTS.
+  - FIX 6d — `showRunInfo()` refattorizzata interamente per usare `t('runinfo.*')` e `_jName/_jDesc` dei joker.
+  - FIX 6e — Joker click popup usa `_jName/_jDesc` con lookup statico JOKERS, e rarity da `t('rarity.<lvl>')`, trigger label da `t('joker.triggerLabel')`.
+  - FIX 6f — Tarot use popup: "USA ADESSO" → `t('tarot.use')`, "ANNULLA" → `t('btn.cancel')`. Nome/descrizione tarocco con `_jName/_jDesc`.
+  - FIX 6g — Combo help popup: COMBO_EXAMPLES ora ha solo `cards` (rimossi `desc` hardcoded), descrizioni da `t('combo.desc.<id>')`. Titolo/header colonne/tip/bottone OK tutti via `t()`.
+- `game/shop.js`
+  - FIX 7 — Aggiunti helper `_jName()` e `_jDesc()` all'inizio del file. Modificati i punti di display (renderShop joker/tarot, joker swap popup, lootbox card name) per usare gli helper. I costruttori `name: j.name` mantenuti per backward compat (i nomi visualizzati ora derivano dal lookup statico tramite helper).
+- `game/zodiac.js`
+  - FIX 8a — `_getString` ora usa `window.t()` per lingua corrente, con fallback a STRINGS.it.
+  - FIX 8b/c/d — Aggiunto helper `_getZodiacLabel(sign)` che usa `t('zodiac.sign.*')`. Sostituiti i due usi di `ZODIAC_LABELS[...]` in `showPrediction` e `_renderZodiacDetail`.
+  - FIX 8c — Stringa "Le stelle guardano" ora via `_getString('zodiac.starsWatch', 'Le stelle guardano')`.
+  - FIX 8e — `_getBonusDesc` ora restituisce `descEn` quando `lang === 'en'`.
+- `game/index.html`
+  - FIX 9 — Aggiunto `data-i18n="stat.<key>"` ai 8 `<td class="stat-label">` in screen-settings (così `applyLang()` li traduce automaticamente).
+
+### Security checks raccomandati
+- Verificare che nessun valore originale di `j.name` / `j.description` / `t.name` / `t.description` finisca in `innerHTML` senza passare per `_escape()` — i nuovi helper `_jName/_jDesc` restituiscono ancora stringhe non escapate, e il chiamante deve fare `_escape()` (controllato: tutti i call site sono dentro `_escape(...)`).
+- Verificare che il cambio lingua a runtime aggiorni correttamente le stringhe: i popup vengono costruiti al momento dell'apertura, quindi rispecchiano la lingua corrente.
+- `node --check` su tutti e 5 i file modificati: passato.
+- Verificare che `nameEn`/`descriptionEn`/`descEn` siano sempre stringhe (mai user input) — sono hardcoded in data.js, OK.
+- Verificare che il fallback IT funzioni se `nameEn` manca su un joker (helper restituisce `obj.name`).
