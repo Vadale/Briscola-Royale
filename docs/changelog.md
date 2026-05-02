@@ -1,5 +1,40 @@
 # Changelog — BRISCOLA ROYALE
 
+## 2026-05-02 — Polish visivo sprites.js
+
+**Agente**: coder
+
+### Cosa è stato fatto
+- `_suitSymbol()` riscritto con path bezier:
+  - **bastoni**: corpo tornito affusolato (path C-curve con 3 nodi/bulbi ovali, venatura centrale, highlight)
+  - **coppe**: bowl Q-curva con bordo dorato, riflesso interno, stelo con nodo, base svasata
+  - **denari**: moneta con anello dorato, 8 raggi computati (cos/sin), centro doppio, highlight
+  - **spade**: lama triangolare con fuller, crossguard con 2 palline gialle, grip con wraps, pommel
+- `_miniSuit()` ora produce vere mini-forme dei semi (bastone, U-calice, mini-moneta a 2 cerchi, triangolo-spada con crossguard) invece del cerchio piatto.
+- `SPRITES.card()` ha 2 corner index (top-left + bottom-right ruotato 180° attorno al centro carta 35,52.5): valore + mini-suit, come una vera playing card. Rimossi il singolo testo basso-sx e il cerchio basso-dx.
+- Figure (`_figFante/Cavallo/Re`) ora a 28 righe (era 24), pxH 2.2, palette estesa con shadow/highlight color (`_shade()` runtime helper) per giacca/manto/pelle. Aggiunti dettagli: piuma berretto Fante, plume elmo Cavallo, corona arricchita Re, occhi 3px, colletto, bottoni, cuffi, ombre laterali.
+- `cardBack()`: pattern alternato croci+diamanti (era solo losanghe), medaglione centrale a 4 cerchi concentrici con BR, 4 flourish a foglia/petali agli angoli (rotazioni 0/90/180/270).
+- `_bossPortrait('unknown')` (default): silhouette incappucciata con cappuccio, mantello a bordi irregolari, due occhi rossi luminescenti con drop-shadow + pupilla gialla, bagliore rosso dietro la testa, "?" discreto in basso. Niente più "?" testo gigante.
+- `gennarino()`: ali laterali base (triangoli arancio + dettaglio), ombra a terra ellittica, fumo sigaro a 3 puff (cerchi con opacità decrescente) invece di un singolo path, talons/artigli sulle gambe (sia idle che dancing), pieghe maglia, piuma sulla testa.
+
+### File modificati
+- `/Users/alessandrovadala/Desktop/creatività/game/sprites.js`
+
+### Funzioni preservate
+- Tutte le firme funzione invariate: `card`, `cardBack`, `gennarino`, `slotSymbol`, `jokerCard`, `bossFrame`, `biscaBg`, `test`.
+- `_esc()` invariato.
+- `SPRITES.C` palette invariata.
+- `SPRITES.test()` invariato.
+
+### Verifica
+- `node --check game/sprites.js` → OK
+
+### Security checks consigliati
+- XSS in interpolazioni `${nm}` / `${em}`: già coperti via `_esc()` (invariato). Verificare che nessuna nuova interpolazione introdotta in questa sessione bypassi `_esc()` su input utente.
+- Nessun nuovo input esterno aggiunto. Tutti gli `${...}` sono valori numerici computati o costanti palette.
+
+---
+
 ## 2026-05-02 01:07 — Copertura i18n IT/EN completa
 
 **Agente**: coder

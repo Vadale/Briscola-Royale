@@ -110,6 +110,21 @@ SPRITES.card = function(seme, valore, opts) {
   // Font-size ribbon adattivo a label length
   const ribbonFs = label.length > 6 ? 7 : 9;
 
+  // Indici angolari (numero+mini-seme) come una vera carta da gioco.
+  // Top-left a x~7, y~24-32. Bottom-right ruotato 180 attorno al centro carta.
+  const cornerIndex = `
+    <g>
+      <text x="7" y="24" text-anchor="middle" font-family="monospace"
+            font-size="7" font-weight="bold" fill="${C.nero}">${corner}</text>
+      ${SPRITES._miniSuit(seme, 7, 31)}
+    </g>
+    <g transform="rotate(180 35 52.5)">
+      <text x="7" y="24" text-anchor="middle" font-family="monospace"
+            font-size="7" font-weight="bold" fill="${C.nero}">${corner}</text>
+      ${SPRITES._miniSuit(seme, 7, 31)}
+    </g>
+  `;
+
   return `
 <svg xmlns="http://www.w3.org/2000/svg" class="${cls}" data-seme="${seme}" data-val="${valore}"
      viewBox="0 0 70 105" width="${dim.w}" height="${dim.h}"${filterAttr}>
@@ -128,87 +143,211 @@ SPRITES.card = function(seme, valore, opts) {
         letter-spacing="0.5">${label}</text>
   <!-- area centrale (y=22 a y=84) -->
   <g>${centerArt}</g>
-  <!-- corner basso-sx -->
-  <text x="6" y="100" font-family="monospace" font-size="8" font-weight="bold"
-        fill="${C.nero}">${corner}</text>
-  <!-- decorazione angolo basso-dx (mini-simbolo seme) -->
-  ${SPRITES._miniSuit(seme, 60, 96)}
+  <!-- 4-corner index (top-left + bottom-right ruotato) -->
+  ${cornerIndex}
 </svg>`.trim();
 };
 
-/* mini icona seme (per angolo) */
+/* mini icona seme (per angolo) — vera forma minuta del seme */
 SPRITES._miniSuit = function(seme, cx, cy) {
   const C = SPRITES.C;
-  const colorMap = {
-    bastoni: C.marrone,
-    coppe:   C.rosso,
-    denari:  C.oro,
-    spade:   C.azzurro
-  };
-  const col = colorMap[seme] || C.nero;
-  return `<circle cx="${cx}" cy="${cy}" r="3" fill="${col}" stroke="${C.nero}" stroke-width="0.5"/>`;
+
+  if (seme === 'bastoni') {
+    // bastoncino verticale con un nodo centrale
+    return `
+      <g>
+        <rect x="${cx-1}" y="${cy-3.5}" width="2" height="7"
+              fill="${C.marrone}" stroke="${C.nero}" stroke-width="0.3"/>
+        <ellipse cx="${cx}" cy="${cy}" rx="1.6" ry="1.1"
+                 fill="${C.marroneS}" stroke="${C.nero}" stroke-width="0.25"/>
+      </g>`;
+  }
+
+  if (seme === 'coppe') {
+    // mini-calice: U-shape
+    return `
+      <g>
+        <path d="M ${cx-2} ${cy-2.5} L ${cx-2} ${cy} Q ${cx} ${cy+2} ${cx+2} ${cy} L ${cx+2} ${cy-2.5} Z"
+              fill="${C.rosso}" stroke="${C.nero}" stroke-width="0.3"/>
+        <rect x="${cx-0.5}" y="${cy+1.8}" width="1" height="1.6" fill="${C.rossoS}"/>
+        <rect x="${cx-1.6}" y="${cy+3}" width="3.2" height="0.9"
+              fill="${C.rossoS}" stroke="${C.nero}" stroke-width="0.25"/>
+      </g>`;
+  }
+
+  if (seme === 'denari') {
+    // mini-moneta
+    return `
+      <g>
+        <circle cx="${cx}" cy="${cy}" r="3"
+                fill="${C.oro}" stroke="${C.oroS}" stroke-width="0.5"/>
+        <circle cx="${cx}" cy="${cy}" r="1.3"
+                fill="${C.oroS}" stroke="${C.nero}" stroke-width="0.25"/>
+      </g>`;
+  }
+
+  if (seme === 'spade') {
+    // mini-spada: triangolo punta-su + crossguard accennato
+    return `
+      <g>
+        <polygon points="${cx},${cy-3} ${cx-2},${cy+2} ${cx+2},${cy+2}"
+                 fill="${C.azzurro}" stroke="${C.nero}" stroke-width="0.3"/>
+        <rect x="${cx-2}" y="${cy+2}" width="4" height="0.9"
+              fill="${C.azzurroS}" stroke="${C.nero}" stroke-width="0.25"/>
+      </g>`;
+  }
+
+  // fallback
+  return `<circle cx="${cx}" cy="${cy}" r="2.5" fill="${C.nero}"/>`;
 };
 
-/* ---------- SIMBOLI SEMI ---------- */
+/* ---------- SIMBOLI SEMI (path-based, dettagliati) ---------- */
 SPRITES._suitSymbol = function(seme, cx, cy, scale) {
   scale = scale || 1;
   const C = SPRITES.C;
   const s = scale;
 
   if (seme === 'bastoni') {
-    // bastone verticale (con scale: w=5*s, h=20*s)
-    const w = 5 * s, h = 22 * s;
-    const x = cx - w/2, y = cy - h/2;
+    // Bastone tornito: corpo affusolato, 3 nodi/bulbi, venatura centrale
+    const halfH = 11 * s;
+    const topW = 2.2 * s;
+    const midW = 3 * s;
+    const botW = 2.6 * s;
+    const yTop = cy - halfH;
+    const yBot = cy + halfH;
     return `
-      <rect x="${x}" y="${y}" width="${w}" height="${h}"
-            fill="${C.marrone}" stroke="${C.nero}" stroke-width="0.5"/>
-      <circle cx="${cx}" cy="${y + h*0.2}" r="${1.6*s}" fill="${C.marroneS}" stroke="${C.nero}" stroke-width="0.4"/>
-      <circle cx="${cx}" cy="${y + h*0.5}" r="${1.6*s}" fill="${C.marroneS}" stroke="${C.nero}" stroke-width="0.4"/>
-      <circle cx="${cx}" cy="${y + h*0.8}" r="${1.6*s}" fill="${C.marroneS}" stroke="${C.nero}" stroke-width="0.4"/>
+      <g>
+        <path d="M ${cx-topW} ${yTop}
+                 C ${cx-topW-0.6*s} ${cy-halfH*0.5}, ${cx-midW} ${cy-halfH*0.2}, ${cx-midW} ${cy}
+                 C ${cx-midW} ${cy+halfH*0.4}, ${cx-botW} ${cy+halfH*0.7}, ${cx-botW*0.7} ${yBot}
+                 L ${cx+botW*0.7} ${yBot}
+                 C ${cx+botW} ${cy+halfH*0.7}, ${cx+midW} ${cy+halfH*0.4}, ${cx+midW} ${cy}
+                 C ${cx+midW} ${cy-halfH*0.2}, ${cx+topW+0.6*s} ${cy-halfH*0.5}, ${cx+topW} ${yTop}
+                 Z"
+              fill="${C.marrone}" stroke="${C.nero}" stroke-width="0.5"/>
+        <line x1="${cx}" y1="${yTop+0.8*s}" x2="${cx}" y2="${yBot-0.8*s}"
+              stroke="${C.marroneS}" stroke-width="0.4" opacity="0.7"/>
+        <ellipse cx="${cx}" cy="${cy-halfH*0.55}" rx="${1.6*s}" ry="${1.1*s}"
+                 fill="${C.marroneS}" stroke="${C.nero}" stroke-width="0.4"/>
+        <ellipse cx="${cx}" cy="${cy}" rx="${2*s}" ry="${1.3*s}"
+                 fill="${C.marroneS}" stroke="${C.nero}" stroke-width="0.4"/>
+        <ellipse cx="${cx}" cy="${cy+halfH*0.55}" rx="${1.7*s}" ry="${1.1*s}"
+                 fill="${C.marroneS}" stroke="${C.nero}" stroke-width="0.4"/>
+        <ellipse cx="${cx-topW*0.4}" cy="${cy-halfH*0.55}" rx="${0.5*s}" ry="${0.3*s}"
+                 fill="${C.bianco}" opacity="0.5"/>
+      </g>
     `;
   }
 
   if (seme === 'coppe') {
-    // calice rosso semplice
-    const w = 12 * s, h = 16 * s;
-    const x = cx - w/2, y = cy - h/2;
+    // Calice: bowl Q-curva, stelo, base svasata, riflesso interno
+    const bowlW = 11 * s;
+    const bowlH = 8 * s;
+    const yTop = cy - 8 * s;
+    const stemY = yTop + bowlH;
+    const baseY = stemY + 3 * s;
+    const baseW = 9 * s;
     return `
-      <rect x="${x}" y="${y}" width="${w}" height="${h*0.55}"
-            fill="${C.rosso}" stroke="${C.nero}" stroke-width="0.5"/>
-      <rect x="${cx - 1*s}" y="${y + h*0.55}" width="${2*s}" height="${h*0.25}"
-            fill="${C.rossoS}" stroke="${C.nero}" stroke-width="0.5"/>
-      <rect x="${x}" y="${y + h*0.8}" width="${w}" height="${h*0.2}"
-            fill="${C.rossoS}" stroke="${C.nero}" stroke-width="0.5"/>
-      <rect x="${x + 2*s}" y="${y + 2*s}" width="${w - 4*s}" height="${1.2*s}"
-            fill="${C.rosa}" opacity="0.7"/>
+      <g>
+        <!-- bowl -->
+        <path d="M ${cx-bowlW/2} ${yTop}
+                 Q ${cx-bowlW/2 - 0.4*s} ${yTop+bowlH*0.6}, ${cx-bowlW*0.18} ${stemY}
+                 L ${cx+bowlW*0.18} ${stemY}
+                 Q ${cx+bowlW/2 + 0.4*s} ${yTop+bowlH*0.6}, ${cx+bowlW/2} ${yTop}
+                 Z"
+              fill="${C.rosso}" stroke="${C.nero}" stroke-width="0.5"/>
+        <!-- bordo dorato superiore -->
+        <rect x="${cx-bowlW/2}" y="${yTop}" width="${bowlW}" height="${1.2*s}"
+              fill="${C.oro}" stroke="${C.nero}" stroke-width="0.4"/>
+        <!-- riflesso bowl interno -->
+        <path d="M ${cx-bowlW*0.32} ${yTop+1.6*s}
+                 Q ${cx-bowlW*0.42} ${yTop+bowlH*0.55}, ${cx-bowlW*0.1} ${yTop+bowlH*0.78}"
+              stroke="${C.rosa}" stroke-width="${0.9*s}" fill="none" opacity="0.7" stroke-linecap="round"/>
+        <!-- stelo -->
+        <rect x="${cx-1*s}" y="${stemY}" width="${2*s}" height="${3*s}"
+              fill="${C.rossoS}" stroke="${C.nero}" stroke-width="0.4"/>
+        <!-- nodo metà stelo -->
+        <ellipse cx="${cx}" cy="${stemY+1.5*s}" rx="${1.6*s}" ry="${0.7*s}"
+                 fill="${C.oroS}" stroke="${C.nero}" stroke-width="0.3"/>
+        <!-- base svasata -->
+        <path d="M ${cx-baseW/2} ${baseY+1.6*s}
+                 Q ${cx-baseW*0.2} ${baseY-0.2*s}, ${cx-baseW*0.2} ${baseY-0.4*s}
+                 L ${cx+baseW*0.2} ${baseY-0.4*s}
+                 Q ${cx+baseW*0.2} ${baseY-0.2*s}, ${cx+baseW/2} ${baseY+1.6*s}
+                 Z"
+              fill="${C.rossoS}" stroke="${C.nero}" stroke-width="0.5"/>
+      </g>
     `;
   }
 
   if (seme === 'denari') {
-    // moneta dorata
+    // Moneta: cerchio esterno + ring scuro + 8 raggi + centro + highlight
     const r = 9 * s;
+    const rIn = 6.2 * s;
+    const rCore = 2.6 * s;
+    // 8 raggi tra rIn e r
+    let rays = '';
+    for (let i = 0; i < 8; i++) {
+      const a = (i * Math.PI / 4) + Math.PI / 8;
+      const x1 = cx + Math.cos(a) * (rIn + 0.2 * s);
+      const y1 = cy + Math.sin(a) * (rIn + 0.2 * s);
+      const x2 = cx + Math.cos(a) * (r - 0.6 * s);
+      const y2 = cy + Math.sin(a) * (r - 0.6 * s);
+      rays += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${C.oroS}" stroke-width="${0.6*s}" stroke-linecap="round"/>`;
+    }
     return `
-      <circle cx="${cx}" cy="${cy}" r="${r}" fill="${C.oro}" stroke="${C.oroS}" stroke-width="1.2"/>
-      <circle cx="${cx}" cy="${cy}" r="${r * 0.65}" fill="${C.oroS}" stroke="${C.nero}" stroke-width="0.5"/>
-      <text x="${cx}" y="${cy + 2.5*s}" text-anchor="middle"
-            font-family="monospace" font-weight="bold" font-size="${7*s}"
-            fill="${C.oro}" stroke="${C.nero}" stroke-width="0.3">$</text>
+      <g>
+        <circle cx="${cx}" cy="${cy}" r="${r}"
+                fill="${C.oro}" stroke="${C.oroS}" stroke-width="${1.2*s}"/>
+        <circle cx="${cx}" cy="${cy}" r="${rIn}"
+                fill="none" stroke="${C.oroS}" stroke-width="${0.8*s}"/>
+        ${rays}
+        <circle cx="${cx}" cy="${cy}" r="${rCore}"
+                fill="${C.oroS}" stroke="${C.nero}" stroke-width="0.4"/>
+        <circle cx="${cx}" cy="${cy}" r="${rCore*0.45}"
+                fill="${C.oro}"/>
+        <ellipse cx="${cx-r*0.45}" cy="${cy-r*0.45}" rx="${1.6*s}" ry="${0.9*s}"
+                 fill="${C.bianco}" opacity="0.55"/>
+      </g>
     `;
   }
 
   if (seme === 'spade') {
-    // spada blu verticale con guardia
-    const lameW = 3.2 * s, lameH = 18 * s;
-    const x = cx - lameW/2, y = cy - lameH/2;
+    // Spada: lama triangolare con fuller, crossguard con palline, grip, pommel
+    const bladeH = 12 * s;
+    const bladeW = 5 * s;
+    const yTip = cy - 9 * s;
+    const yGuard = yTip + bladeH;
+    const yGripBot = yGuard + 4.5 * s;
     return `
-      <rect x="${x}" y="${y}" width="${lameW}" height="${lameH * 0.7}"
-            fill="${C.azzurro}" stroke="${C.nero}" stroke-width="0.5"/>
-      <polygon points="${cx},${y - 2*s} ${x},${y + 1.5*s} ${x + lameW},${y + 1.5*s}"
-               fill="${C.azzurro}" stroke="${C.nero}" stroke-width="0.5"/>
-      <rect x="${cx - 7*s}" y="${y + lameH*0.7 - 1*s}" width="${14*s}" height="${2.5*s}"
-            fill="${C.azzurroS}" stroke="${C.nero}" stroke-width="0.5"/>
-      <rect x="${cx - 1.6*s}" y="${y + lameH*0.7 + 1.5*s}" width="${3.2*s}" height="${5*s}"
-            fill="${C.marrone}" stroke="${C.nero}" stroke-width="0.5"/>
+      <g>
+        <!-- lama -->
+        <polygon points="${cx},${yTip} ${cx-bladeW/2},${yGuard} ${cx+bladeW/2},${yGuard}"
+                 fill="${C.azzurro}" stroke="${C.nero}" stroke-width="0.5"/>
+        <!-- fuller / scanalatura -->
+        <line x1="${cx}" y1="${yTip+1.2*s}" x2="${cx}" y2="${yGuard-0.6*s}"
+              stroke="${C.azzurroS}" stroke-width="0.5" opacity="0.85"/>
+        <!-- highlight lama -->
+        <line x1="${cx-0.9*s}" y1="${yTip+2*s}" x2="${cx-1.6*s}" y2="${yGuard-1.5*s}"
+              stroke="${C.bianco}" stroke-width="0.4" opacity="0.55"/>
+        <!-- crossguard -->
+        <rect x="${cx-7*s}" y="${yGuard-0.5*s}" width="${14*s}" height="${1.8*s}"
+              fill="${C.azzurroS}" stroke="${C.nero}" stroke-width="0.5"/>
+        <circle cx="${cx-7*s}" cy="${yGuard+0.4*s}" r="${1*s}"
+                fill="${C.oro}" stroke="${C.nero}" stroke-width="0.4"/>
+        <circle cx="${cx+7*s}" cy="${yGuard+0.4*s}" r="${1*s}"
+                fill="${C.oro}" stroke="${C.nero}" stroke-width="0.4"/>
+        <!-- grip -->
+        <rect x="${cx-1.4*s}" y="${yGuard+1.4*s}" width="${2.8*s}" height="${4*s}"
+              fill="${C.marrone}" stroke="${C.nero}" stroke-width="0.4"/>
+        <line x1="${cx-1.4*s}" y1="${yGuard+2.6*s}" x2="${cx+1.4*s}" y2="${yGuard+2.6*s}"
+              stroke="${C.marroneS}" stroke-width="0.4"/>
+        <line x1="${cx-1.4*s}" y1="${yGuard+4*s}" x2="${cx+1.4*s}" y2="${yGuard+4*s}"
+              stroke="${C.marroneS}" stroke-width="0.4"/>
+        <!-- pommel -->
+        <circle cx="${cx}" cy="${yGripBot+0.6*s}" r="${1.6*s}"
+                fill="${C.oro}" stroke="${C.nero}" stroke-width="0.5"/>
+      </g>
     `;
   }
   return '';
@@ -244,9 +383,8 @@ SPRITES._cardPips = function(seme, n) {
 };
 
 /* ============================================================
-   FIGURE: pixel art con rect (16 col x 24 righe area centrale)
-   Origine area centrale: x=10..58 (w=48), y=22..82 (h=60)
-   Pixel size: 3x2.5 -> usiamo 3px per col, 2.5px per riga
+   FIGURE: pixel art con rect (16 col x 28 righe area centrale)
+   Origine area centrale: x=10, y=22 — pxW=3, pxH=2.2
    ============================================================ */
 
 /* Helper: riempi una matrice di rect in scala */
@@ -264,6 +402,18 @@ SPRITES._pix = function(rows, originX, originY, pxW, pxH, palette) {
     }
   }
   return out;
+};
+
+/* Helper: lighten/darken (versione semplice) — usato per palette runtime */
+SPRITES._shade = function(hex, amt) {
+  // hex es. "#aabbcc" o "#abc"
+  let h = hex.replace('#','');
+  if (h.length === 3) h = h.split('').map(c => c + c).join('');
+  const r = Math.max(0, Math.min(255, parseInt(h.slice(0,2),16) + amt));
+  const g = Math.max(0, Math.min(255, parseInt(h.slice(2,4),16) + amt));
+  const b = Math.max(0, Math.min(255, parseInt(h.slice(4,6),16) + amt));
+  const toHex = (n) => n.toString(16).padStart(2,'0');
+  return '#' + toHex(r) + toHex(g) + toHex(b);
 };
 
 /* ---------- Helper: simbolo tenuto in mano dal Fante (lato destro, piccolo) ---------- */
@@ -359,41 +509,56 @@ SPRITES._figFante = function(seme) {
   // Colore giacca e berretto cambiano per seme
   const semeColor = { bastoni: C.marrone, coppe: C.rosso, denari: C.oro, spade: C.azzurro };
   const jacketCol = semeColor[seme] || C.azzurro;
+  const jacketShade = SPRITES._shade(jacketCol, -40);
+  const jacketHi    = SPRITES._shade(jacketCol, 35);
   const pal = {
-    K: C.nero, P: C.pelle, H: C.capelli,
-    R: jacketCol,  // berretto = colore seme
-    B: jacketCol,  // giacca = colore seme
+    K: C.nero,
+    P: C.pelle,
+    L: SPRITES._shade(C.pelle, 18),  // highlight pelle
+    D: SPRITES._shade(C.pelle, -25), // ombra pelle
+    H: C.capelli,
+    R: jacketCol,        // berretto = colore seme
+    r: jacketShade,      // ombra berretto
+    B: jacketCol,        // giacca = colore seme
+    b: jacketShade,      // ombra giacca
+    h: jacketHi,         // highlight giacca
     G: C.pantaloni,
+    g: SPRITES._shade(C.pantaloni, -20),
     O: C.oro,
     S: C.bianco
   };
+  // 28 righe x 16 col — più dettaglio: piuma sul berretto, occhi 3px, colletto, bottoni, cuffi
   const rows = [
-    '     RRRRRR     ',
-    '    RRRRRRRR    ',
-    '    KRRRRRRK    ',
-    '    PPPPPPPP    ',
-    '   PPHHHHPPP    ',
-    '   PPKPPKPPP    ',
-    '   PPPPPPPPP    ',
-    '   PPPKKKPPP    ',
-    '   SSSSSSSSS    ',
-    '  BBBBBBBBBBB   ',
-    '  BBBOBBBBBBB   ',
-    '  BBBBBBBOBBB   ',
-    '  BBBBBOBBBBB   ',
-    '  BBBBBBBBBBB   ',
-    '  BBBBOBBBBBB   ',
-    '   BBBBBBBBB    ',
-    '   GGG  GGGG    ',
-    '   GGG  GGGG    ',
-    '   GGG  GGGG    ',
-    '   GGG  GGGG    ',
-    '   GGG  GGGG    ',
-    '   GGG  GGGG    ',
-    '   KKK  KKKK    ',
-    '   KKK  KKKK    '
+    '      OOO       ',
+    '     ROOOO      ',
+    '    rRRRRRR     ',
+    '   rRRRRRRRRr   ',
+    '   rRRRRRRRRr   ',
+    '   KrRRRRRRrK   ',
+    '    LPPPPPPL    ',
+    '   LPHHHHHHPL   ',
+    '   LPHHHHHHPL   ',
+    '   PPKLPPLKPP   ',
+    '   PPDPPPPDPP   ',
+    '   PPPPDDPPPP   ',
+    '   PPPHHHHHPP   ',
+    '   SSSSSSSSSS   ',
+    '   SOSSSSSSOS   ',
+    '  bBBBBBBBBBb   ',
+    ' bBBhhBBBBhhBb  ',
+    ' BBBhBBOBBhBBB  ',
+    ' BBBBBBOBBBBBB  ',
+    ' BBBBBBOBBBBBB  ',
+    ' BBBBBBOBBBBBB  ',
+    ' bBBBBBBBBBBBb  ',
+    '  bBBBBBBBBBb   ',
+    '   GGGggGGGgg   ',
+    '   GGGggGGGgg   ',
+    '   GGGggGGGgg   ',
+    '   KKKKKKKKKK   ',
+    '   KKKKKKKKKK   '
   ];
-  const pixels = SPRITES._pix(rows, 10, 22, 3, 2.5, pal);
+  const pixels = SPRITES._pix(rows, 10, 22, 3, 2.2, pal);
   // Simbolo del seme tenuto in mano (lato destro della figura)
   const emblem = SPRITES._figEmblem(seme, 52, 42);
   return `<g stroke="${C.nero}" stroke-width="0.3">${pixels}${emblem}</g>`;
@@ -404,39 +569,55 @@ SPRITES._figCavallo = function(seme) {
   const C = SPRITES.C;
   const semeColor = { bastoni: C.marrone, coppe: C.rosso, denari: C.oro, spade: C.azzurro };
   const mantello = semeColor[seme] || C.rosso;
+  const mantelloS = SPRITES._shade(mantello, -40);
+  const mantelloH = SPRITES._shade(mantello, 30);
   const pal = {
-    K: C.nero, M: C.marrone, N: C.marroneS,
+    K: C.nero,
+    M: C.marrone,
+    N: C.marroneS,
+    n: SPRITES._shade(C.marrone, -30), // ombra cavallo
     P: C.pelle,
-    R: mantello,  // mantello = colore seme
-    O: C.oro, G: C.giallo, L: C.azzurro
+    L: SPRITES._shade(C.pelle, 18),
+    D: SPRITES._shade(C.pelle, -25),
+    R: mantello,
+    r: mantelloS,
+    h: mantelloH,
+    O: C.oro,
+    G: C.giallo,
+    H: C.capelli,
   };
+  // 28 righe — più dettaglio elmo, plume, sella
   const rows = [
     '       OO       ',
     '      OOOO      ',
-    '      KPPK      ',
-    '      PPPP      ',
-    '     PRRRR      ',
-    '    RRRRRRR     ',
-    '    RRRRRRR     ',
-    '   RRRRRRRRR    ',
-    '   RRRRRRRRR    ',
-    '   ORROORROR    ',
-    '    M  MM  M    ',
-    '    MMMMMMMM    ',
-    '   MMMMMMMMMM   ',
+    '     OOGGOO     ',
+    '     KPPPPK     ',
+    '     PPLLPP     ',
+    '     PDPPDP     ',
+    '    PPHHHHPP    ',
+    '    rRRRRRRr    ',
+    '   rRRhhRRRRr   ',
+    '   RRRRRRRRRR   ',
+    '  rRRRRRRRRRRr  ',
+    '  RRRRRRRRRRR   ',
+    '  ORROORRORRO   ',
+    '   M  MM  M     ',
+    '   MMNMMMMNMM   ',
     '  MMMMMMMMMMMM  ',
     '  MMMMMMMMMMMM  ',
-    '  MMMMMMMMMMMNN ',
-    '  MMMMMMMMMMMNN ',
-    '   MMMMMMMMNNN  ',
+    '  MnMMMMMMMMnM  ',
+    '  MnMMMMMMMMnN  ',
+    '   MMMMMMMMNN   ',
     '    M    MMNN   ',
     '    M    M      ',
     '    M    M      ',
     '    M    M      ',
+    '    n    n      ',
+    '    n    n      ',
     '    K    K      ',
     '    K    K      '
   ];
-  const pixels = SPRITES._pix(rows, 10, 22, 3, 2.5, pal);
+  const pixels = SPRITES._pix(rows, 10, 22, 3, 2.2, pal);
   // Arma/insegna del cavaliere cambia per seme
   const weapon = SPRITES._figWeapon(seme);
   return `<g stroke="${C.nero}" stroke-width="0.3">${pixels}${weapon}</g>`;
@@ -450,40 +631,55 @@ SPRITES._figRe = function(seme) {
   // versione più scura per la parte bassa del manto
   const mantoS = { bastoni: C.marroneS, coppe: C.rossoS, denari: C.oroS, spade: '#1565c0' };
   const mantoScuro = mantoS[seme] || C.rossoS;
+  const mantoHi    = SPRITES._shade(mantoCol, 30);
   const pal = {
-    K: C.nero, O: C.oro, Y: C.giallo,
-    P: C.pelle, H: C.capelli, W: C.bianco,
-    R: mantoCol,   // manto superiore = colore seme
-    M: mantoScuro, // manto inferiore = colore seme scuro
+    K: C.nero,
+    O: C.oro,
+    Y: C.giallo,
+    g: SPRITES._shade(C.oro, -20),
+    P: C.pelle,
+    L: SPRITES._shade(C.pelle, 20), // highlight pelle
+    D: SPRITES._shade(C.pelle, -25), // ombra pelle
+    H: C.capelli,
+    W: C.bianco,
+    R: mantoCol,        // manto superiore = colore seme
+    r: SPRITES._shade(mantoCol, -25), // ombra
+    h: mantoHi,         // highlight manto
+    M: mantoScuro,      // manto inferiore = colore seme scuro
     G: C.oroS
   };
+  // 28 righe: corona + barba + manto più dettagliato
   const rows = [
     '   O  O  O  O   ',
     '   OO OO OO OO  ',
+    '   OYOOYYOOYYO  ',
     '   OOOOOOOOOOO  ',
-    '   OYYOYYOYYOG  ',
-    '    PPPPPPPPP   ',
-    '   PPHHHHHHPP   ',
-    '   PPKPPPPKPPP  ',
-    '   PPPPPPPPPP   ',
+    '   gOYYOYYOYYg  ',
+    '   gggggggggg   ',
+    '    LPPPPPPL    ',
+    '   LPHHHHHHPL   ',
+    '   PPKLPPLKPP   ',
+    '   PPDPPPPDPP   ',
     '   PPPHHHHPPP   ',
-    '   RRRWRRWRRR   ',
-    '  RRRRRRRRRRR   ',
-    ' RRRRRRRRRRRRR  ',
+    '   PPHHHHHHPP   ',
+    '    PHHHHHHP    ',
+    '   rRRWRRWRRr   ',
+    '  rRRRRRRRRRRr  ',
+    ' rRRhRRRRRRhRRr ',
     ' RRRRROOORRRRR  ',
     ' RRRROYYYYORRR  ',
+    ' RRRROYGYYORRR  ',
     ' RRRRROOORRRRR  ',
-    ' RRRRRRRRRRRRR  ',
-    ' MMMMMMMMMMMMM  ',
-    ' MMMMMMMMMMMMM  ',
+    ' rRRRRRRRRRRRRr ',
     ' MMMMMMMMMMMMM  ',
     ' MMMMMMMMMMMMM  ',
     ' MMMMMMMMMMMMM  ',
     '  MMMMMMMMMMM   ',
+    '  MMMM   MMMM   ',
     '  KKKK   KKKK   ',
     '  KKKK   KKKK   '
   ];
-  const pixels = SPRITES._pix(rows, 10, 22, 3, 2.5, pal);
+  const pixels = SPRITES._pix(rows, 10, 22, 3, 2.2, pal);
   // Scettro del re: varia per seme
   const scepter = SPRITES._figScepter(seme);
   return `<g stroke="${C.nero}" stroke-width="0.3">${pixels}${scepter}</g>`;
@@ -498,17 +694,42 @@ SPRITES.cardBack = function(opts) {
   const dim = SPRITES._sz(size);
   const C = SPRITES.C;
 
-  // Pattern losanghe
+  // Pattern alternato: croci + diamanti in griglia regolare
   let pattern = '';
   for (let r = 0; r < 9; r++) {
-    for (let c = 0; c < 6; c++) {
-      const cx = 8 + c * 11;
+    for (let c = 0; c < 7; c++) {
+      const cx = 7 + c * 9;
       const cy = 22 + r * 9 + (c % 2 ? 4.5 : 0);
-      pattern += `<polygon points="${cx},${cy-3} ${cx+3},${cy} ${cx},${cy+3} ${cx-3},${cy}"
-        fill="${C.verde}" stroke="${C.nero}" stroke-width="0.3"/>`;
-      pattern += `<circle cx="${cx}" cy="${cy}" r="0.8" fill="${C.oro}"/>`;
+      const useCross = ((r + c) % 2) === 0;
+      if (useCross) {
+        // piccolo "+"
+        pattern += `<rect x="${cx-0.4}" y="${cy-2.2}" width="0.8" height="4.4" fill="${C.oro}" opacity="0.55"/>`;
+        pattern += `<rect x="${cx-2.2}" y="${cy-0.4}" width="4.4" height="0.8" fill="${C.oro}" opacity="0.55"/>`;
+      } else {
+        // piccolo diamante
+        pattern += `<polygon points="${cx},${cy-2.4} ${cx+2.2},${cy} ${cx},${cy+2.4} ${cx-2.2},${cy}"
+          fill="${C.verde}" stroke="${C.oro}" stroke-width="0.25" opacity="0.85"/>`;
+        pattern += `<circle cx="${cx}" cy="${cy}" r="0.5" fill="${C.oro}"/>`;
+      }
     }
   }
+
+  // Flourishes 4 angoli — foglia 3 petali stilizzata
+  const flourish = (cx, cy, rot) => `
+    <g transform="rotate(${rot} ${cx} ${cy})">
+      <polygon points="${cx-3},${cy} ${cx},${cy-4} ${cx+3},${cy} ${cx},${cy+1}"
+               fill="${C.oro}" stroke="${C.nero}" stroke-width="0.3"/>
+      <polygon points="${cx-2.5},${cy-0.5} ${cx-5.5},${cy-3} ${cx-3.5},${cy+1}"
+               fill="${C.oroS}" stroke="${C.nero}" stroke-width="0.25"/>
+      <polygon points="${cx+2.5},${cy-0.5} ${cx+5.5},${cy-3} ${cx+3.5},${cy+1}"
+               fill="${C.oroS}" stroke="${C.nero}" stroke-width="0.25"/>
+      <circle cx="${cx}" cy="${cy}" r="0.7" fill="${C.rosso}"/>
+    </g>`;
+  const corners =
+    flourish(10, 24, 0) +
+    flourish(60, 24, 90) +
+    flourish(60, 96, 180) +
+    flourish(10, 96, 270);
 
   return `
 <svg xmlns="http://www.w3.org/2000/svg" class="card-svg card-back-svg"
@@ -522,18 +743,23 @@ SPRITES.cardBack = function(opts) {
         fill="${C.oroS}" stroke="${C.nero}" stroke-width="0.5"/>
   <text x="35" y="14" text-anchor="middle" font-family="monospace"
         font-size="9" font-weight="bold" fill="${C.bianco}" letter-spacing="1">BISCA</text>
-  <!-- pattern -->
+  <!-- pattern croci+diamanti -->
   <g>${pattern}</g>
-  <!-- monogramma BR centro -->
-  <rect x="22" y="44" width="26" height="22" fill="${C.nero}" opacity="0.55" rx="2"/>
-  <text x="35" y="60" text-anchor="middle"
+  <!-- medaglione centrale concentrico -->
+  <circle cx="35" cy="55" r="16" fill="${C.nero}" opacity="0.55"/>
+  <circle cx="35" cy="55" r="14" fill="none" stroke="${C.oro}" stroke-width="0.8"/>
+  <circle cx="35" cy="55" r="11" fill="none" stroke="${C.oroS}" stroke-width="0.6"/>
+  <circle cx="35" cy="55" r="8"  fill="none" stroke="${C.oro}" stroke-width="0.4"/>
+  <text x="35" y="59" text-anchor="middle"
         font-family="monospace" font-size="14" font-weight="bold"
         fill="${C.oro}" stroke="${C.nero}" stroke-width="0.5">BR</text>
-  <!-- cornetto pixel sotto -->
-  <polygon points="35,72 32,82 38,82" fill="${C.rosso}" stroke="${C.nero}" stroke-width="0.5"/>
-  <rect x="33.5" y="71" width="3" height="2" fill="${C.oro}" stroke="${C.nero}" stroke-width="0.3"/>
-  <rect x="34" y="74" width="0.8" height="1" fill="${C.bianco}"/>
-  <rect x="35.5" y="76" width="0.8" height="1" fill="${C.bianco}"/>
+  <!-- cornetto pixel sotto medaglione -->
+  <polygon points="35,76 32,84 38,84" fill="${C.rosso}" stroke="${C.nero}" stroke-width="0.5"/>
+  <rect x="33.5" y="75" width="3" height="2" fill="${C.oro}" stroke="${C.nero}" stroke-width="0.3"/>
+  <rect x="34" y="78" width="0.8" height="1" fill="${C.bianco}"/>
+  <rect x="35.5" y="80" width="0.8" height="1" fill="${C.bianco}"/>
+  <!-- 4 corner flourishes -->
+  ${corners}
 </svg>`.trim();
 };
 
@@ -581,6 +807,7 @@ SPRITES.gennarino = function(emotion, size) {
   const testa = `
     <ellipse cx="32" cy="14" rx="14" ry="9"
              fill="#c8651a" stroke="${C.nero}" stroke-width="0.7"/>
+    <ellipse cx="28" cy="11" rx="5" ry="2.5" fill="#e07a2a" opacity="0.6"/>
   `;
 
   // Occhi/occhiali secondo emotion
@@ -632,14 +859,15 @@ SPRITES.gennarino = function(emotion, size) {
     `;
   }
 
-  // Sigaro per idle
+  // Sigaro per idle — fumo a 3 puff
   let sigaro = '';
   if (emotion === 'idle') {
     sigaro = `
       <rect x="36" y="20" width="6" height="2" fill="${C.grigioS}" stroke="${C.nero}" stroke-width="0.4"/>
       <rect x="41.5" y="20" width="0.8" height="2" fill="${C.rosso}"/>
-      <path d="M 43 20 Q 45 17 44 14 Q 43 12 45 10" stroke="${C.bianco}" stroke-width="0.7"
-            fill="none" opacity="0.7" class="smoke"/>
+      <circle cx="44"  cy="17" r="1.4" fill="${C.bianco}" opacity="0.85" class="smoke"/>
+      <circle cx="45.5" cy="13" r="1.7" fill="${C.bianco}" opacity="0.6"  class="smoke"/>
+      <circle cx="44.5" cy="9"  r="2.0" fill="${C.bianco}" opacity="0.35" class="smoke"/>
     `;
   }
 
@@ -684,12 +912,20 @@ SPRITES.gennarino = function(emotion, size) {
     `;
   }
 
-  // Corpo: maglia azzurra Napoli con "10" giallo
+  // Ombra a terra
+  const shadow = `<ellipse cx="32" cy="60" rx="18" ry="2.5" fill="${C.nero}" opacity="0.35"/>`;
+
+  // Corpo: maglia azzurra Napoli con "10" giallo + ali di base ai lati
   // Inclinazione per dancing
   const tilt = (emotion === 'dancing') ? ' transform="rotate(-15 32 38)"' : '';
 
   const corpo = `
     <g${tilt}>
+      <!-- ali laterali (idle/base) — piccoli triangoli arancio -->
+      <polygon points="14,28 10,24 13,36" fill="#c8651a" stroke="${C.nero}" stroke-width="0.5"/>
+      <polygon points="50,28 54,24 51,36" fill="#c8651a" stroke="${C.nero}" stroke-width="0.5"/>
+      <line x1="12" y1="28" x2="12" y2="32" stroke="${C.nero}" stroke-width="0.3"/>
+      <line x1="52" y1="28" x2="52" y2="32" stroke="${C.nero}" stroke-width="0.3"/>
       <!-- maglia azzurra -->
       <rect x="14" y="22" width="36" height="22" fill="${C.azzurro}" stroke="${C.nero}" stroke-width="0.7"/>
       <!-- bordino giallo collo -->
@@ -699,6 +935,9 @@ SPRITES.gennarino = function(emotion, size) {
       <rect x="47" y="22" width="3" height="3" fill="${C.giallo}" stroke="${C.nero}" stroke-width="0.4"/>
       <!-- pancia -->
       <rect x="16" y="40" width="32" height="4" fill="${C.azzurroS}" opacity="0.5"/>
+      <!-- pieghe maglia (dettaglio) -->
+      <line x1="20" y1="28" x2="20" y2="40" stroke="${C.azzurroS}" stroke-width="0.4" opacity="0.7"/>
+      <line x1="44" y1="28" x2="44" y2="40" stroke="${C.azzurroS}" stroke-width="0.4" opacity="0.7"/>
       <!-- catenona dorata (arco) -->
       <path d="M 18 26 Q 32 34 46 26" stroke="${C.oro}" stroke-width="2.2"
             fill="none"/>
@@ -713,7 +952,7 @@ SPRITES.gennarino = function(emotion, size) {
     </g>
   `;
 
-  // Gambe (V per dancing)
+  // Gambe (V per dancing) — con artigli
   let gambe = '';
   if (emotion === 'dancing') {
     gambe = `
@@ -723,6 +962,13 @@ SPRITES.gennarino = function(emotion, size) {
       <line x1="36" y1="44" x2="42" y2="56" stroke="${C.nero}" stroke-width="0.4"/>
       <rect x="18" y="55" width="8" height="3" fill="${C.giallo}" stroke="${C.nero}" stroke-width="0.4"/>
       <rect x="38" y="55" width="8" height="3" fill="${C.giallo}" stroke="${C.nero}" stroke-width="0.4"/>
+      <!-- artigli -->
+      <line x1="19" y1="58" x2="17" y2="60" stroke="${C.nero}" stroke-width="0.5"/>
+      <line x1="22" y1="58" x2="22" y2="60" stroke="${C.nero}" stroke-width="0.5"/>
+      <line x1="25" y1="58" x2="27" y2="60" stroke="${C.nero}" stroke-width="0.5"/>
+      <line x1="39" y1="58" x2="37" y2="60" stroke="${C.nero}" stroke-width="0.5"/>
+      <line x1="42" y1="58" x2="42" y2="60" stroke="${C.nero}" stroke-width="0.5"/>
+      <line x1="45" y1="58" x2="47" y2="60" stroke="${C.nero}" stroke-width="0.5"/>
     `;
   } else {
     gambe = `
@@ -731,10 +977,13 @@ SPRITES.gennarino = function(emotion, size) {
       <rect x="22" y="54" width="11" height="3" fill="${C.giallo}" stroke="${C.nero}" stroke-width="0.4"/>
       <rect x="31" y="54" width="11" height="3" fill="${C.giallo}" stroke="${C.nero}" stroke-width="0.4"/>
       <line x1="22" y1="55.5" x2="33" y2="55.5" stroke="${C.nero}" stroke-width="0.3"/>
-      <line x1="26" y1="55.5" x2="26" y2="57" stroke="${C.nero}" stroke-width="0.3"/>
-      <line x1="30" y1="55.5" x2="30" y2="57" stroke="${C.nero}" stroke-width="0.3"/>
-      <line x1="35" y1="55.5" x2="35" y2="57" stroke="${C.nero}" stroke-width="0.3"/>
-      <line x1="39" y1="55.5" x2="39" y2="57" stroke="${C.nero}" stroke-width="0.3"/>
+      <!-- artigli/talons piegati -->
+      <line x1="23" y1="57" x2="22" y2="59.5" stroke="${C.nero}" stroke-width="0.5"/>
+      <line x1="27" y1="57" x2="27" y2="59.5" stroke="${C.nero}" stroke-width="0.5"/>
+      <line x1="31" y1="57" x2="32" y2="59.5" stroke="${C.nero}" stroke-width="0.5"/>
+      <line x1="34" y1="57" x2="33" y2="59.5" stroke="${C.nero}" stroke-width="0.5"/>
+      <line x1="38" y1="57" x2="38" y2="59.5" stroke="${C.nero}" stroke-width="0.5"/>
+      <line x1="42" y1="57" x2="43" y2="59.5" stroke="${C.nero}" stroke-width="0.5"/>
     `;
   }
 
@@ -757,6 +1006,7 @@ SPRITES.gennarino = function(emotion, size) {
 <svg xmlns="http://www.w3.org/2000/svg" class="gennarino"
      viewBox="0 0 64 64" width="${size}" height="${size}"
      data-emotion="${emotion}">
+  ${shadow}
   ${cresta}
   ${rabbia}
   ${thinkBubble}
@@ -1110,10 +1360,50 @@ SPRITES._bossPortrait = function(id) {
     `;
 
     default: return `
-      <rect x="0" y="0" width="160" height="160" fill="#2d2d2d"/>
-      <text x="80" y="105" text-anchor="middle" font-family="monospace"
-            font-size="120" font-weight="bold" fill="${C.bianco}"
-            stroke="${C.nero}" stroke-width="2">?</text>
+      <!-- atmosfera nera + nebbia rossa -->
+      <rect x="0" y="0" width="160" height="160" fill="#1a0a14"/>
+      <ellipse cx="80" cy="140" rx="80" ry="20" fill="${C.rossoS}" opacity="0.3"/>
+      <ellipse cx="80" cy="120" rx="60" ry="14" fill="${C.rosso}" opacity="0.18"/>
+      <!-- silhouette incappucciata: corpo + mantello con bordi irregolari -->
+      <path d="M 80 30
+               Q 60 30 55 55
+               L 50 80
+               Q 35 100 30 160
+               L 45 160
+               Q 50 130 55 110
+               L 55 160
+               L 105 160
+               L 105 110
+               Q 110 130 115 160
+               L 130 160
+               Q 125 100 110 80
+               L 105 55
+               Q 100 30 80 30 Z"
+            fill="#0a0506" stroke="${C.nero}" stroke-width="1.5"/>
+      <!-- cappuccio (ombra interna) -->
+      <path d="M 60 40 Q 80 32 100 40 Q 100 65 90 75 L 70 75 Q 60 65 60 40 Z"
+            fill="${C.nero}" stroke="${C.nero}" stroke-width="1"/>
+      <!-- bordi mantello irregolari -->
+      <polygon points="30,160 38,150 44,160" fill="${C.nero}"/>
+      <polygon points="44,160 52,148 58,160" fill="${C.nero}"/>
+      <polygon points="100,160 108,148 114,160" fill="${C.nero}"/>
+      <polygon points="116,160 124,150 130,160" fill="${C.nero}"/>
+      <!-- volto in ombra: solo contorno fioco -->
+      <ellipse cx="80" cy="62" rx="14" ry="16" fill="#160709"/>
+      <!-- occhi rossi luminescenti -->
+      <circle cx="74" cy="60" r="3.5" fill="${C.rosso}" filter="drop-shadow(0 0 3px #e63946)"/>
+      <circle cx="86" cy="60" r="3.5" fill="${C.rosso}" filter="drop-shadow(0 0 3px #e63946)"/>
+      <circle cx="74" cy="60" r="1.5" fill="${C.giallo}"/>
+      <circle cx="86" cy="60" r="1.5" fill="${C.giallo}"/>
+      <!-- bagliore generale rosso dietro la testa -->
+      <circle cx="80" cy="60" r="22" fill="${C.rosso}" opacity="0.08"/>
+      <!-- spunzoni / bordi cappuccio -->
+      <polygon points="58,42 54,32 64,40" fill="${C.nero}"/>
+      <polygon points="102,42 106,32 96,40" fill="${C.nero}"/>
+      <!-- "?" stilizzato discreto in basso -->
+      <text x="80" y="148" text-anchor="middle" font-family="monospace"
+            font-size="22" font-weight="bold" fill="${C.rosso}"
+            stroke="${C.nero}" stroke-width="1" opacity="0.85">?</text>
     `;
   }
 };
