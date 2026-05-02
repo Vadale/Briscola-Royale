@@ -197,6 +197,7 @@ function calculateScore(playedCards, jokers, modifiers) {
     runScore: modifiers.runScore || 0,
     maxDiscards: modifiers.maxDiscards || 3,
     handSize: modifiers.handSize || 5,
+    hand: modifiers.hand || [],  // carte non giocate (per garzone e joker simili)
     // ctx.random è iniettato qui per tarocchi e joker (determinismo)
     random: modifiers.random || Math.random,
   };
@@ -241,6 +242,13 @@ function calculateScore(playedCards, jokers, modifiers) {
     if (modifiers.noFigureBonus && isFigura) cardChips = 0;
     if (modifiers.onlyNumbers && isFigura) cardChips = 0;
     if (modifiers.noAssoChips && card.valore === 1) cardChips = 0;
+    if (modifiers.figuresZeroNumbersNormal) {
+      if (isFigura) {
+        cardChips = 0;
+      } else if (typeof card.valore === 'number') {
+        cardChips = card.valore; // 1=1, 2=2 ... 7=7 (Asso perde il bonus briscola da 11)
+      }
+    }
     if (modifiers.halfDenari && card.seme === 'denari') cardChips = Math.floor(cardChips / 2);
     ctx.chips += cardChips;
 

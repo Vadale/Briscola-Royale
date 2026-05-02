@@ -23,7 +23,7 @@ function _jDesc(obj) {
 const SEMI_LIST = ['bastoni', 'coppe', 'denari', 'spade'];
 const BOSS_RULES_RANDOM_POOL = [
   'no_discard', 'half_denari', 'less_hands', 'no_figure_bonus',
-  'change_briscola', 'half_chips', 'only_numbers', 'less_hand_size',
+  'change_briscola', 'half_chips', 'only_numbers', 'less_hand_size', 'figures_zero_numbers_normal',
   'pay_per_hand', 'min_3_cards', 'swap_hand_discard', 'no_asso_chips',
   'invert_combo_mult', 'pay_per_draw', 'no_new_combos', 'steal_draws'
 ];
@@ -752,6 +752,7 @@ function playHand() {
     runScore: run.runScore,
     maxDiscards: BALANCE.discardsPerBlind,
     handSize: run.hand.length,
+    hand: run.hand.filter((_, i) => !sel.includes(i)),  // carte in mano non selezionate
   };
 
   const rule = run.bossRule;
@@ -761,6 +762,7 @@ function playHand() {
   if (rule === 'only_numbers') modifiers.onlyNumbers = true;
   if (rule === 'no_asso_chips') modifiers.noAssoChips = true;
   if (rule === 'invert_combo_mult') modifiers.invertComboMult = true;
+  if (rule === 'figures_zero_numbers_normal') modifiers.figuresZeroNumbersNormal = true;
   if (rule === 'no_new_combos') modifiers.noNewCombos = true;
 
   // Leone zodiac: prima mano ×1.5 chips

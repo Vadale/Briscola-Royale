@@ -295,8 +295,9 @@ const DECK_NAPOLI = (() => {
 //   double_target      → target ×1.5 (boss normali) oppure ×2 (munaciello_oro, Ante 8)
 //   min_3_cards        → devi giocare almeno 3 carte per mano
 //   swap_hand_discard  → handsPerBlind ↔ discardsPerBlind
-//   no_asso_chips      → gli Assi danno 0 chip (aggiunto con pinocchio_bugiardo)
-//   invert_combo_mult  → moltiplicatori combo invertiti: singola×10, scopa×1 (befana_roma)
+//   no_asso_chips             → gli Assi danno 0 chip (aggiunto con pinocchio_bugiardo)
+//   invert_combo_mult         → moltiplicatori combo invertiti: singola×10, scopa×1 (befana_roma)
+//   figures_zero_numbers_normal → figure=0 chip, numeriche=chip pari al valore (donna_carmela)
 const BOSSES = [
   {
     id: 'pulcinella_nero',
@@ -342,8 +343,8 @@ const BOSSES = [
     intro: 'Il sangue non si è sciolto. Niente miracolo.',
     onLose: 'La fede tua è poca, figliolo.',
     onWin: 'Hai meritato la mia benedizione.',
-    difficulty: 3,
-    firstAnte: 2,
+    difficulty: 4,
+    firstAnte: 3,
     portrait: 'sangennaro',
   },
   {
@@ -545,6 +546,18 @@ const BOSSES = [
     portrait: 'munaciello',
   },
   {
+    id: 'donna_carmela',
+    name: 'Donna Carmela',
+    rule: 'figures_zero_numbers_normal',
+    ruleDesc: 'Le figure danno 0 chip. Tutte le numeriche (incluso Asso) danno chip pari al loro valore (7=7, 3=3, 1=1).',
+    intro: "I numeri non mentono. Le facce sì.",
+    onLose: "Le cifre parlano chiaro, guagliò. Tu non capisci.",
+    onWin: "...Bene. Hai capito i numeri. Forse sei meno stupido di quanto penso.",
+    difficulty: 4,
+    firstAnte: 4,
+    portrait: 'generic',
+  },
+  {
     id: 'munaciello_oro',
     name: "'O Munaciello d'Oro",
     rule: 'double_target',
@@ -731,8 +744,8 @@ const JOKERS = [
     name: "'O Re Cafone",
     nameEn: "The Boorish King",
     emoji: '👑',
-    rarity: 'uncommon',
-    cost: 6,
+    rarity: 'rare',
+    cost: 8,
     description: 'I Re danno chips ×3.',
     descriptionEn: "Kings give chips ×3.",
     trigger: 'on_card_scored',
@@ -963,6 +976,46 @@ const JOKERS = [
     trigger: 'on_card_scored',
     effectCode: 'if (ctx.card && ctx.card.valore === 1) { ctx.chips += 50; ctx.mult += 1; }',
     art: { bg: '#bf360c', icon: '🌋' },
+  },
+  // -------- Aggiunte: archetype figure --------
+  {
+    id: 'garzone',
+    name: "'O Garzone",
+    nameEn: "The Apprentice",
+    emoji: '🃏',
+    rarity: 'common',
+    cost: 4,
+    description: '+5 chips per ogni figura in mano (non giocata) quando giochi.',
+    descriptionEn: '+5 chips for each face card held in hand (unplayed) when you play.',
+    trigger: 'on_hand_played',
+    effectCode: 'var figInHand = (ctx.hand||[]).filter(function(c){ return ["fante","cavallo","re"].includes(c.valore); }).length; ctx.chips += 5 * figInHand;',
+    art: { bg: '#8b6914', icon: '🃏' },
+  },
+  {
+    id: 'scala_reale',
+    name: "'A Scala Reale",
+    nameEn: "The Royal Court",
+    emoji: '👑',
+    rarity: 'uncommon',
+    cost: 6,
+    description: 'Se la mano giocata contiene Fante + Cavallo + Re (qualsiasi seme): +2 mult.',
+    descriptionEn: 'If the played hand contains Fante + Cavallo + Re (any suit): +2 mult.',
+    trigger: 'on_hand_played',
+    effectCode: 'var vals = ctx.played.map(function(c){return c.valore;}); if (vals.includes("fante") && vals.includes("cavallo") && vals.includes("re")) { ctx.mult += 2; }',
+    art: { bg: '#9d4edd', icon: '👑' },
+  },
+  {
+    id: 'tre_campanari',
+    name: "'O Tre Campanari",
+    nameEn: "The Three Bell-Ringers",
+    emoji: '🔔',
+    rarity: 'rare',
+    cost: 8,
+    description: 'Se giochi esattamente 3 figure (Fante/Cavallo/Re): +30 chips e +3 mult.',
+    descriptionEn: 'If you play exactly 3 face cards (Fante/Cavallo/Re): +30 chips and +3 mult.',
+    trigger: 'on_hand_played',
+    effectCode: 'var fig = ctx.played.filter(function(c){ return ["fante","cavallo","re"].includes(c.valore); }); if (fig.length === 3) { ctx.chips += 30; ctx.mult += 3; }',
+    art: { bg: '#d4a017', icon: '🔔' },
   },
 ];
 
@@ -1269,6 +1322,15 @@ const TAROTS = [
     description: 'Aggiunge +1 slot Joker permanentemente (max 7).',
     descriptionEn: 'Adds +1 joker slot permanently (max 7).',
     effectCode: 'if (ctx.maxJokerSlots < 7) { ctx.maxJokerSlots += 1; }',
+  },
+  {
+    id: 'cavaliere',
+    name: 'Il Cavaliere',
+    nameEn: 'The Knight',
+    emoji: '🐴',
+    description: 'Trasforma le prime 2 carte numeriche in mano in Cavallo dello stesso seme.',
+    descriptionEn: 'Transform the first 2 numeric cards in hand into Cavallos of the same suit.',
+    effectCode: 'var tc=ctx.turnCount||0; var changed=0; for(var i=0;i<ctx.hand.length&&changed<2;i++){var c=ctx.hand[i]; if(typeof c.valore==="number"&&c.valore>=2&&c.valore<=7){ctx.hand[i]={id:c.seme+"_cavallo_t"+tc+"_"+i,seme:c.seme,valore:"cavallo",chips:9}; changed++;}}',
   },
 ];
 
